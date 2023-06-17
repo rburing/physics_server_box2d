@@ -23,7 +23,7 @@ void Box2DCollisionObject::_update_shapes() {
 			s.fixtures.resize(box2d_shape_count);
 			for (int j = 0; j < box2d_shape_count; j++) {
 				b2FixtureDef fixture_def;
-				fixture_def.shape = s.shape->get_transformed_b2Shape(j, s.xform);
+				fixture_def.shape = s.shape->get_transformed_b2Shape(j, s.xform, s.one_way_collision, s.one_way_collision_margin);
 				fixture_def.density = 1.0f;
 				fixture_def.isSensor = type == Type::TYPE_AREA;
 				fixture_def.userData.shape_idx = i;
@@ -83,6 +83,20 @@ void Box2DCollisionObject::set_shape_disabled(int p_index, bool p_disabled) {
 	shape.fixtures.clear();
 
 	// TODO: (queue) update
+}
+
+void Box2DCollisionObject::set_shape_as_one_way_collision(int p_index, bool enable, double margin) {
+	ERR_FAIL_INDEX(p_index, shapes.size());
+
+	Shape &shape = shapes.write[p_index];
+	if (shape.one_way_collision == enable) {
+		return;
+	}
+
+	shape.one_way_collision = enable;
+	shape.one_way_collision_margin = margin;
+
+	_update_shapes();
 }
 
 void Box2DCollisionObject::remove_shape(Box2DShape *p_shape) {

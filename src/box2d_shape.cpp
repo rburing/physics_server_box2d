@@ -19,7 +19,7 @@ Variant Box2DShapeCircle::get_data() const {
 	return radius;
 }
 
-b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform) {
+b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2CircleShape *shape = memnew(b2CircleShape);
 	godot_to_box2d(radius, shape->m_radius);
@@ -45,7 +45,7 @@ Variant Box2DShapeRectangle::get_data() const {
 	return half_extents;
 }
 
-b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform) {
+b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	b2Vec2 box2d_half_extents;
@@ -88,7 +88,7 @@ int Box2DShapeCapsule::get_b2Shape_count() {
 	return 3;
 }
 
-b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform2D &p_transform) {
+b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
 	ERR_FAIL_INDEX_V(p_index, 3, nullptr);
 	if (p_index == 0 || p_index == 1) {
 		b2CircleShape *shape = memnew(b2CircleShape);
@@ -136,7 +136,7 @@ Variant Box2DShapeConvexPolygon::get_data() const {
 	return points_array;
 }
 
-b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform) {
+b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	b2Vec2 *box2d_points = new b2Vec2[points.size()];
@@ -176,17 +176,21 @@ Variant Box2DShapeConcavePolygon::get_data() const {
 }
 
 int Box2DShapeConcavePolygon::get_b2Shape_count() {
-	// TODO: Split into chains instead of having separate edges?
 	return points.size() / 2;
 }
 
-b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform) {
+b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
 	ERR_FAIL_INDEX_V(p_index, points.size() / 2, nullptr);
 	b2EdgeShape *shape = memnew(b2EdgeShape);
-	b2Vec2 box2d_endpoints[2];
-	godot_to_box2d(p_transform.xform(points[2 * p_index]), box2d_endpoints[0]);
-	godot_to_box2d(p_transform.xform(points[2 * p_index + 1]), box2d_endpoints[1]);
-	shape->SetTwoSided(box2d_endpoints[0], box2d_endpoints[1]);
+	b2Vec2 edge_endpoints[2];
+	godot_to_box2d(p_transform.xform(points[2 * p_index]), edge_endpoints[0]);
+	godot_to_box2d(p_transform.xform(points[2 * p_index + 1]), edge_endpoints[1]);
+	if (one_way) {
+		b2Vec2 dirV0 = edge_endpoints[0] - edge_endpoints[1];
+		shape->SetOneSided(edge_endpoints[1] + dirV0, edge_endpoints[0], edge_endpoints[1], edge_endpoints[0] - dirV0);
+	} else {
+		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
+	}
 	return shape;
 }
 
@@ -194,4 +198,39 @@ Box2DShapeConcavePolygon::Box2DShapeConcavePolygon() {
 }
 
 Box2DShapeConcavePolygon::~Box2DShapeConcavePolygon() {
+}
+
+/* SEGMENT SHAPE */
+
+void Box2DShapeSegment::set_data(const Variant &p_data) {
+	ERR_FAIL_COND(p_data.get_type() != Variant::RECT2);
+	Rect2 rect = p_data;
+	a = rect.get_position();
+	b = rect.get_size();
+	configured = true;
+}
+
+Variant Box2DShapeSegment::get_data() const {
+	return Rect2(a, b);
+}
+
+b2Shape *Box2DShapeSegment::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
+	b2EdgeShape *shape = memnew(b2EdgeShape);
+	b2Vec2 edge_endpoints[2];
+	godot_to_box2d(p_transform.xform(a), edge_endpoints[0]);
+	godot_to_box2d(p_transform.xform(b), edge_endpoints[1]);
+	if (one_way) {
+		b2Vec2 dirV0 = edge_endpoints[0] - edge_endpoints[1];
+		shape->SetOneSided(edge_endpoints[1] + dirV0, edge_endpoints[0], edge_endpoints[1], edge_endpoints[0] - dirV0);
+	} else {
+		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
+	}
+	return shape;
+}
+
+Box2DShapeSegment::Box2DShapeSegment() {
+}
+
+Box2DShapeSegment::~Box2DShapeSegment() {
 }

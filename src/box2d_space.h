@@ -16,6 +16,7 @@ class Box2DSpace {
 private:
 	RID self;
 
+	int active_body_count = 0;
 	b2World *world = nullptr;
 
 	SelfList<Box2DBody>::List active_list;
@@ -39,12 +40,14 @@ public:
 	void add_object(Box2DCollisionObject *p_object);
 	void remove_object(Box2DCollisionObject *p_object);
 
-	void step(float p_step) const;
+	void step(float p_step);
 	void call_queries();
 
 	bool is_locked() const { return locked; }
 	void lock() { locked = true; }
 	void unlock() { locked = false; }
+
+	int get_active_body_count();
 
 	Box2DSpace();
 	~Box2DSpace();

@@ -27,7 +27,7 @@ public:
 	virtual Variant get_data() const = 0;
 
 	virtual int get_b2Shape_count() = 0;
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) = 0;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) = 0;
 
 	Box2DShape() {}
 	virtual ~Box2DShape(){};
@@ -40,7 +40,7 @@ public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
 	virtual int get_b2Shape_count() override { return 1; };
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) override;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
 
 	Box2DShapeCircle();
 	~Box2DShapeCircle();
@@ -53,7 +53,7 @@ public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
 	virtual int get_b2Shape_count() override { return 1; }
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) override;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
 
 	Box2DShapeRectangle();
 	~Box2DShapeRectangle();
@@ -67,7 +67,7 @@ public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
 	virtual int get_b2Shape_count() override;
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) override;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
 
 	Box2DShapeCapsule();
 	~Box2DShapeCapsule();
@@ -80,7 +80,7 @@ public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
 	virtual int get_b2Shape_count() override { return 1; }
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) override;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
 
 	Box2DShapeConvexPolygon();
 	~Box2DShapeConvexPolygon();
@@ -93,10 +93,24 @@ public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
 	virtual int get_b2Shape_count() override;
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform) override;
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
 
 	Box2DShapeConcavePolygon();
 	~Box2DShapeConcavePolygon();
+};
+
+class Box2DShapeSegment : public Box2DShape {
+	Vector2 a;
+	Vector2 b;
+
+public:
+	virtual void set_data(const Variant &p_data) override;
+	virtual Variant get_data() const override;
+	virtual int get_b2Shape_count() override { return 1; };
+	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) override;
+
+	Box2DShapeSegment();
+	~Box2DShapeSegment();
 };
 
 #endif // BOX2D_SHAPE_H

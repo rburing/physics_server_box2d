@@ -27,6 +27,12 @@ RID PhysicsServerBox2D::_shape_create(ShapeType p_shape) {
 		case SHAPE_CONCAVE_POLYGON: {
 			shape = memnew(Box2DShapeConcavePolygon);
 		} break;
+		case SHAPE_SEGMENT: {
+			shape = memnew(Box2DShapeSegment);
+		} break;
+		default: {
+			ERR_PRINT("shape not supported");
+		} break;
 	}
 
 	RID id = shape_owner.make_rid(shape);
@@ -53,6 +59,10 @@ RID PhysicsServerBox2D::_convex_polygon_shape_create() {
 
 RID PhysicsServerBox2D::_concave_polygon_shape_create() {
 	return _shape_create(SHAPE_CONCAVE_POLYGON);
+}
+
+RID PhysicsServerBox2D::_segment_shape_create() {
+	return _shape_create(SHAPE_SEGMENT);
 }
 
 void PhysicsServerBox2D::_shape_set_data(const RID &p_shape, const Variant &p_data) {
@@ -357,6 +367,13 @@ void PhysicsServerBox2D::_body_set_shape_disabled(const RID &p_body, int32_t p_s
 	body->set_shape_disabled(p_shape_idx, p_disabled);
 }
 
+void PhysicsServerBox2D::_body_set_shape_as_one_way_collision(const RID &p_body, int32_t shape_idx, bool enable, double margin) {
+	Box2DBody *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_COND(!body);
+
+	body->set_shape_as_one_way_collision(shape_idx, enable, margin);
+}
+
 void PhysicsServerBox2D::_body_attach_object_instance_id(const RID &p_body, uint64_t p_id) {
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND(!body);
@@ -455,7 +472,8 @@ void PhysicsServerBox2D::_step(double p_step) {
 	// TODO: _update_shapes();
 
 	for (const Box2DSpace *E : active_spaces) {
-		E->step((float)p_step);
+		Box2DSpace *space = const_cast<Box2DSpace *>(E);
+		space->step((float)p_step);
 	}
 }
 
@@ -489,4 +507,24 @@ PhysicsServerBox2D::PhysicsServerBox2D() {
 }
 
 PhysicsServerBox2D::~PhysicsServerBox2D() {
+}
+
+int PhysicsServerBox2D::_get_process_info (ProcessInfo process_info) {
+	switch(process_info) {
+		case INFO_ACTIVE_OBJECTS: {
+			int active_body_count = 0;
+			for (const Box2DSpace *E : active_spaces) {
+				Box2DSpace *space = const_cast<Box2DSpace *>(E);
+				active_body_count += space->get_active_body_count();
+			}
+			return active_body_count;
+		} break;
+		case INFO_COLLISION_PAIRS: {
+			ERR_PRINT("TODO not implemented");
+		} break;
+		case INFO_ISLAND_COUNT: {
+			ERR_PRINT("TODO not implemented");
+		} break;
+	}
+	return 0;
 }

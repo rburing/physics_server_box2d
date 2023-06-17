@@ -26,7 +26,6 @@ using namespace godot;
 
 class PhysicsServerBox2D : public PhysicsServer2DExtension {
 	GDCLASS(PhysicsServerBox2D, PhysicsServer2DExtension);
-
 	bool active = true;
 	bool doing_sync = false;
 
@@ -52,6 +51,7 @@ public:
 	virtual RID _capsule_shape_create() override;
 	virtual RID _convex_polygon_shape_create() override;
 	virtual RID _concave_polygon_shape_create() override;
+	virtual RID _segment_shape_create() override;
 	virtual void _shape_set_data(const RID &shape, const Variant &data) override;
 	virtual Variant _shape_get_data(const RID &shape) const override;
 
@@ -96,6 +96,7 @@ public:
 	virtual void _body_clear_shapes(const RID &body) override;
 
 	virtual void _body_set_shape_disabled(const RID &p_body, int32_t p_shape_idx, bool p_disabled) override;
+	virtual void _body_set_shape_as_one_way_collision(const RID &p_body, int32_t shape_idx, bool enable, double margin) override;
 
 	virtual void _body_attach_object_instance_id(const RID &p_body, uint64_t p_id) override; // should be ObjectID
 	virtual uint64_t _body_get_object_instance_id(const RID &p_body) const override;
@@ -118,6 +119,8 @@ public:
 	virtual void _finish() override;
 
 	virtual bool _is_flushing_queries() const override { return flushing_queries; };
+
+	virtual int _get_process_info ( ProcessInfo process_info ) override;
 
 	PhysicsServerBox2D();
 	~PhysicsServerBox2D();

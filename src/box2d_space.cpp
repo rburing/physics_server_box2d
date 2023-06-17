@@ -46,7 +46,7 @@ void Box2DSpace::call_queries() {
 	// TODO: areas
 }
 
-void Box2DSpace::step(float p_step) const {
+void Box2DSpace::step(float p_step) {
 	const int32 velocityIterations = 10;
 	const int32 positionIterations = 8;
 
@@ -54,10 +54,16 @@ void Box2DSpace::step(float p_step) const {
 
 	const SelfList<Box2DBody>::List *body_list = &get_active_body_list();
 	const SelfList<Box2DBody> *b = body_list->first();
+	active_body_count = 0;
 	while (b) {
+		active_body_count++;
 		b->self()->after_step();
 		b = b->next();
 	}
+}
+
+int Box2DSpace::get_active_body_count() {
+	return active_body_count;
 }
 
 Box2DSpace::Box2DSpace() {

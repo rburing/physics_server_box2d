@@ -34,6 +34,8 @@ protected:
 		Box2DShape *shape = nullptr;
 		Vector<b2Fixture *> fixtures;
 		bool disabled = false;
+		bool one_way_collision = false;
+		double one_way_collision_margin = 0;
 	};
 
 	Vector<Shape> shapes;
@@ -78,6 +80,7 @@ public:
 	void set_shape(int p_index, Box2DShape *p_shape);
 	void set_shape_transform(int p_index, const Transform2D &p_transform);
 	void set_shape_disabled(int p_index, bool p_disabled);
+	void set_shape_as_one_way_collision(int p_index, bool enable, double margin);
 
 	_FORCE_INLINE_ int get_shape_count() const { return shapes.size(); }
 	_FORCE_INLINE_ Box2DShape *get_shape(int p_index) const {
