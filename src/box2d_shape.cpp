@@ -19,18 +19,12 @@ Variant Box2DShapeCircle::get_data() const {
 	return radius;
 }
 
-b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2CircleShape *shape = memnew(b2CircleShape);
 	godot_to_box2d(radius, shape->m_radius);
 	godot_to_box2d(p_transform.get_origin(), shape->m_p);
 	return shape;
-}
-
-Box2DShapeCircle::Box2DShapeCircle() {
-}
-
-Box2DShapeCircle::~Box2DShapeCircle() {
 }
 
 /* RECTANGLE SHAPE */
@@ -45,7 +39,7 @@ Variant Box2DShapeRectangle::get_data() const {
 	return half_extents;
 }
 
-b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	b2Vec2 box2d_half_extents;
@@ -54,12 +48,6 @@ b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transfo
 	godot_to_box2d(p_transform.get_origin(), box2d_origin);
 	shape->SetAsBox(box2d_half_extents.x, box2d_half_extents.y, box2d_origin, p_transform.get_rotation());
 	return shape;
-}
-
-Box2DShapeRectangle::Box2DShapeRectangle() {
-}
-
-Box2DShapeRectangle::~Box2DShapeRectangle() {
 }
 
 /* CAPSULE SHAPE */
@@ -88,7 +76,7 @@ int Box2DShapeCapsule::get_b2Shape_count() {
 	return 3;
 }
 
-b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 3, nullptr);
 	if (p_index == 0 || p_index == 1) {
 		b2CircleShape *shape = memnew(b2CircleShape);
@@ -107,12 +95,6 @@ b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform
 		return shape;
 	}
 	return nullptr; // This line is never reached, but it silences the compiler warning.
-}
-
-Box2DShapeCapsule::Box2DShapeCapsule() {
-}
-
-Box2DShapeCapsule::~Box2DShapeCapsule() {
 }
 
 /* CONVEX POLYGON SHAPE */
@@ -136,7 +118,7 @@ Variant Box2DShapeConvexPolygon::get_data() const {
 	return points_array;
 }
 
-b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	b2Vec2 *box2d_points = new b2Vec2[points.size()];
@@ -146,12 +128,6 @@ b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Tra
 	shape->Set(box2d_points, (int)points.size());
 	delete[] box2d_points;
 	return shape;
-}
-
-Box2DShapeConvexPolygon::Box2DShapeConvexPolygon() {
-}
-
-Box2DShapeConvexPolygon::~Box2DShapeConvexPolygon() {
 }
 
 /* CONCAVE POLYGON SHAPE */
@@ -179,7 +155,7 @@ int Box2DShapeConcavePolygon::get_b2Shape_count() {
 	return points.size() / 2;
 }
 
-b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, points.size() / 2, nullptr);
 	b2EdgeShape *shape = memnew(b2EdgeShape);
 	b2Vec2 edge_endpoints[2];
@@ -192,12 +168,6 @@ b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Tr
 		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
 	}
 	return shape;
-}
-
-Box2DShapeConcavePolygon::Box2DShapeConcavePolygon() {
-}
-
-Box2DShapeConcavePolygon::~Box2DShapeConcavePolygon() {
 }
 
 /* SEGMENT SHAPE */
@@ -214,7 +184,7 @@ Variant Box2DShapeSegment::get_data() const {
 	return Rect2(a, b);
 }
 
-b2Shape *Box2DShapeSegment::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, double one_way_margin) {
+b2Shape *Box2DShapeSegment::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2EdgeShape *shape = memnew(b2EdgeShape);
 	b2Vec2 edge_endpoints[2];
@@ -229,8 +199,36 @@ b2Shape *Box2DShapeSegment::get_transformed_b2Shape(int p_index, const Transform
 	return shape;
 }
 
-Box2DShapeSegment::Box2DShapeSegment() {
+/* WORLD BOUNDARY SHAPE */
+
+void Box2DShapeWorldBoundary::set_data(const Variant &p_data) {
+	// todo
+	configured = true;
 }
 
-Box2DShapeSegment::~Box2DShapeSegment() {
+Variant Box2DShapeWorldBoundary::get_data() const {
+	// todo
+	return Variant();
+}
+
+b2Shape *Box2DShapeWorldBoundary::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
+	// todo
+	return nullptr;
+}
+
+/* SEPARATION RAY SHAPE */
+
+void Box2DShapeSeparationRay::set_data(const Variant &p_data) {
+	// todo
+	configured = true;
+}
+
+Variant Box2DShapeSeparationRay::get_data() const {
+	// todo
+	return Variant();
+}
+
+b2Shape *Box2DShapeSeparationRay::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
+	// todo
+	return nullptr;
 }

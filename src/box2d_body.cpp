@@ -1,5 +1,66 @@
 #include "box2d_body.h"
 #include "box2d_direct_body_state.h"
+#include "box2d_type_conversions.h"
+
+bool Box2DBody::is_active() const { return active; }
+
+// Physics Server
+
+void Box2DBody::set_max_contacts_reported(int32 p_max_contacts_reported) {
+	max_contacts_reported = p_max_contacts_reported;
+}
+
+int32 Box2DBody::get_max_contacts_reported() {
+	return max_contacts_reported;
+}
+
+void Box2DBody::set_priority(double p_priority) {
+	priority = p_priority;
+}
+
+double Box2DBody::get_priority() {
+	return priority;
+}
+
+void Box2DBody::set_gravity_scale(double p_gravity_scale) {
+	p_gravity_scale = body_def->gravityScale;
+	if (body) {
+		body->SetGravityScale(body_def->gravityScale);
+	}
+}
+void Box2DBody::set_linear_damp(double p_linear_damp) {
+	godot_to_box2d(p_linear_damp, body_def->linearDamping);
+	if (body) {
+		body->SetLinearDamping(body_def->linearDamping);
+	}
+}
+void Box2DBody::set_angular_damp(double p_angular_damp) {
+	godot_to_box2d(p_angular_damp, body_def->angularDamping);
+	if (body) {
+		body->SetAngularDamping(body_def->angularDamping);
+	}
+}
+
+double Box2DBody::get_gravity_scale() {
+	return body_def->gravityScale; // no need to convert
+}
+double Box2DBody::get_linear_damp() {
+	double linear_damp;
+	box2d_to_godot(body_def->linearDamping, linear_damp);
+	return body_def->linearDamping;
+}
+double Box2DBody::get_angular_damp() {
+	double angular_damp;
+	box2d_to_godot(body_def->angularDamping, angular_damp);
+	return angular_damp;
+}
+
+void Box2DBody::wakeup() {
+	if ((!get_space()) || mode == PhysicsServer2D::BODY_MODE_STATIC || mode == PhysicsServer2D::BODY_MODE_KINEMATIC) {
+		return;
+	}
+	set_active(true);
+}
 
 void Box2DBody::set_state_sync_callback(const Callable &p_callable) {
 	body_state_callback = p_callable;
@@ -38,7 +99,7 @@ void Box2DBody::set_angular_velocity(real_t p_angular_velocity) {
 	}
 }
 
-real_t Box2DBody::get_angular_velocity() const {
+double Box2DBody::get_angular_velocity() const {
 	return body->GetAngularVelocity();
 }
 
@@ -208,6 +269,39 @@ void Box2DBody::call_queries() {
 	if (body_state_callback.is_valid()) {
 		body_state_callback.callv(Array::make(direct_state));
 	}
+}
+
+void Box2DBody::set_continuous_collision_detection_mode(PhysicsServer2D::CCDMode p_mode) {
+	collision_mode = p_mode;
+	switch(collision_mode) {
+		case PhysicsServer2D::CCD_MODE_DISABLED: break;
+		case PhysicsServer2D::CCD_MODE_CAST_RAY: break;// bullet
+		case PhysicsServer2D::CCD_MODE_CAST_SHAPE: break;// bullet
+	}
+}
+PhysicsServer2D::CCDMode Box2DBody::get_continuous_collision_detection_mode() const {
+	return collision_mode;
+}
+
+void Box2DBody::add_collision_exception(Box2DBody * excepted_body) {
+	collision_exception.insert(excepted_body);
+}
+void Box2DBody::remove_collision_exception(Box2DBody * excepted_body) {
+	collision_exception.erase(excepted_body);
+}
+TypedArray<RID> Box2DBody::get_collision_exception() {
+	TypedArray<RID> array;
+	for (Box2DBody * E : collision_exception) {
+		array.append(E->get_self());
+	}
+	return array;
+}
+
+void Box2DBody::add_joint(Box2DJoint *p_joint) {
+	joints.insert(p_joint);
+}
+void Box2DBody::remove_joint(Box2DJoint *p_joint) {
+	joints.erase(p_joint);
 }
 
 Box2DBody::Box2DBody() :

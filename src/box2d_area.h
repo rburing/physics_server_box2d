@@ -11,8 +11,16 @@
 using namespace godot;
 
 class Box2DArea : public Box2DCollisionObject {
+	bool monitorable = false;
+	Callable monitor_callback;
+	Callable area_monitor_callback;
 public:
-	void set_transform(const Transform2D &p_transform);
+	// Physics Server
+	void set_monitorable(bool monitorable);
+	void set_monitor_callback(const Callable &callback);
+	void set_area_monitor_callback(const Callable &callback);
+
+	void set_transform(const Transform2D &p_transform) override;
 
 	void set_space(Box2DSpace *p_space) override;
 

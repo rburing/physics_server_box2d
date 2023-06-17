@@ -6,6 +6,7 @@
 
 #include "box2d_body.h"
 #include "box2d_collision_object.h"
+#include "box2d_direct_space_state.h"
 
 const SelfList<Box2DBody>::List &Box2DSpace::get_active_body_list() const {
 	return active_list;
@@ -46,9 +47,19 @@ void Box2DSpace::call_queries() {
 	// TODO: areas
 }
 
+
+void Box2DSpace::set_solver_iterations(int32 p_iterations) {
+	solver_iterations = p_iterations;
+}
+
+int32 Box2DSpace::get_solver_iterations() const {
+	return solver_iterations;
+}
+
 void Box2DSpace::step(float p_step) {
-	const int32 velocityIterations = 10;
-	const int32 positionIterations = 8;
+	step_interval = p_step;
+	const int32 velocityIterations = solver_iterations + 2;
+	const int32 positionIterations = solver_iterations;
 
 	world->Step(p_step, velocityIterations, positionIterations);
 
@@ -62,8 +73,20 @@ void Box2DSpace::step(float p_step) {
 	}
 }
 
+double Box2DSpace::get_step() {
+	return step_interval;
+}
+
 int Box2DSpace::get_active_body_count() {
 	return active_body_count;
+}
+
+Box2DDirectSpaceState *Box2DSpace::get_direct_state() {
+	if (!direct_state) {
+		direct_state = memnew(Box2DDirectSpaceState);
+		direct_state->space = this;
+	}
+	return direct_state;
 }
 
 Box2DSpace::Box2DSpace() {
@@ -73,4 +96,15 @@ Box2DSpace::Box2DSpace() {
 
 Box2DSpace::~Box2DSpace() {
 	memdelete(world);
+}
+
+
+int32_t Box2DSpace::get_contact_count() const {
+	return 0;
+}
+PackedVector2Array Box2DSpace::get_contacts() const {
+	return PackedVector2Array();
+}
+void Box2DSpace::set_debug_contacts(int32_t max_contacts){
+	
 }

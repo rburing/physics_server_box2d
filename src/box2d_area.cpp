@@ -1,5 +1,16 @@
 #include "box2d_area.h"
 
+// Physics Server
+void Box2DArea::set_monitorable(bool p_monitorable){
+	monitorable = p_monitorable;
+}
+void Box2DArea::set_monitor_callback(const Callable &p_callback) {
+	monitor_callback = p_callback;
+}
+void Box2DArea::set_area_monitor_callback(const Callable &p_callback) {
+	area_monitor_callback = p_callback;
+}
+
 void Box2DArea::set_transform(const Transform2D &p_transform) {
 	// TODO: add to moved list?
 
