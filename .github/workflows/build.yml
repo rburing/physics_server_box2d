@@ -1,0 +1,60 @@
+name: Physics Server Box2D Builds
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Load .scons_cache directory
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.scons-cache/
+            ${{ github.workspace }}/godot-cpp/.scons-cache/
+          key: ${{ matrix.os }}-${{ matrix.target }}
+      - name: Setup python and scons
+        uses: ./.github/actions/deps
+      - name: Lint
+        shell: sh
+        run:
+          clang-format
+      - name: Build Godot cpp
+        shell: sh
+        env:
+          SCONS_CACHE: .scons-cache
+          SCONS_CACHE_DIR: .scons-cache
+        run: |
+          cd godot-cpp && scons target=${{ matrix.target }} generate_bindings=yes
+      - name: Build Physics Server Box2D
+        shell: sh
+        env:
+          SCONS_CACHE: .scons-cache
+          SCONS_CACHE_DIR: .scons-cache
+        run: |
+          scons target=${{ matrix.target }} generate_bindings=no
+      - name: Save .scons_cache directory
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.scons-cache/
+            ${{ github.workspace }}/godot-cpp/.scons-cache/
+          key: ${{ matrix.os }}-${{ matrix.target }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Physics Server Box2D - ${{ matrix.os }} - ${{ matrix.target }}
+          path: |
+            ${{ github.workspace }}/demo/bin/
+            ${{ github.workspace }}/demo/physics_server_box2d.gdextension
+          retention-days: 14
