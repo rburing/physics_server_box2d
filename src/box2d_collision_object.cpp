@@ -23,9 +23,7 @@ double Box2DCollisionObject::get_inertia() {
 	return mass_data.I; // no need to convert
 }
 Vector2 Box2DCollisionObject::get_center_of_mass() {
-	Vector2 center;
-	box2d_to_godot(mass_data.center, center);
-	return center;
+	return box2d_to_godot(mass_data.center);
 }
 
 void Box2DCollisionObject::set_mass(double p_mass) {
@@ -48,19 +46,15 @@ void Box2DCollisionObject::set_center_of_mass(Vector2 p_center_of_mass) {
 }
 
 Vector2 Box2DCollisionObject::get_total_gravity() const {
-	return Vector2();
+	return Vector2(); // get gravity from area
 }
 
 double Box2DCollisionObject::get_total_linear_damp() const {
-	double linear_damping;
-	box2d_to_godot(body_def->linearDamping, linear_damping);
-	return linear_damping;
+	return box2d_to_godot(body_def->linearDamping);
 }
 
 double Box2DCollisionObject::get_total_angular_damp() const {
-	double linear_damping;
-	box2d_to_godot(body_def->linearDamping, linear_damping);
-	return linear_damping;
+	return box2d_to_godot(body_def->linearDamping);
 }
 
 Vector2 Box2DCollisionObject::get_center_of_mass() const {
@@ -68,9 +62,7 @@ Vector2 Box2DCollisionObject::get_center_of_mass() const {
 }
 
 Vector2 Box2DCollisionObject::get_center_of_mass_local() const {
-	Vector2 center_local;
-	box2d_to_godot(mass_data.center, center_local);
-	return center_local;
+	return box2d_to_godot(mass_data.center);
 }
 
 double Box2DCollisionObject::get_inverse_mass() const {
@@ -85,53 +77,77 @@ double Box2DCollisionObject::get_inverse_inertia() const {
 	}
 	return 1.0 / mass_data.I;
 }
-void Box2DCollisionObject::set_linear_velocity(const Vector2 &velocity) {
-	godot_to_box2d(velocity, body_def->linearVelocity);
-}
-Vector2 Box2DCollisionObject::get_linear_velocity() const {
-	Vector2 velocity;
+void Box2DCollisionObject::set_linear_velocity(const Vector2 &p_linear_velocity) {
+	b2Vec2 box2d_linear_velocity = godot_to_box2d(p_linear_velocity);
 	if (body) {
-		box2d_to_godot(body->GetLinearVelocity(), velocity);
+		body->SetLinearVelocity(box2d_linear_velocity);
 	}
-	box2d_to_godot(body_def->linearVelocity, velocity);
-	return velocity;
 }
-void Box2DCollisionObject::set_angular_velocity(double velocity) {
-	godot_to_box2d(velocity, body_def->angularVelocity);
+
+Vector2 Box2DCollisionObject::get_linear_velocity() const {
+	if (body) {
+		return box2d_to_godot(body->GetLinearVelocity());
+	}
+	return Vector2();
+}
+void Box2DCollisionObject::set_angular_velocity(double p_velocity) {
+	float angularVelocity = godot_to_box2d(p_velocity);
+	if (body) {
+		body->SetAngularVelocity(angularVelocity);
+	}
 }
 double Box2DCollisionObject::get_angular_velocity() const {
-	double velocity;
-	box2d_to_godot(body_def->angularVelocity, velocity);
-	return velocity;
+	if (body) {
+		return box2d_to_godot(body->GetAngularVelocity());
+	}
+	return 0;
 }
 void Box2DCollisionObject::set_transform(const Transform2D &transform) {
 	_set_transform(transform);
 }
 Transform2D Box2DCollisionObject::get_transform() const {
 	if (body) {
-		Vector2 position;
-		box2d_to_godot(body->GetPosition(), position);
-		return Transform2D(body->GetAngle(), position);
+		return Transform2D(body->GetAngle(), box2d_to_godot(body->GetPosition()));
 	} else {
-		Vector2 position;
-		box2d_to_godot(body_def->position, position);
-		return Transform2D(body_def->angle, position);
+		return Transform2D(body_def->angle, box2d_to_godot(body_def->position));
 	}
 }
-Vector2 Box2DCollisionObject::get_velocity_at_local_position(const Vector2 &local_position) const {
+Vector2 Box2DCollisionObject::get_velocity_at_local_position(const Vector2 &p_local_position) const {
+	if (body) {
+		b2Vec2 velocity = body->GetLinearVelocityFromLocalPoint(godot_to_box2d(p_local_position));
+		return box2d_to_godot(velocity);
+	}
 	return Vector2();
 }
 void Box2DCollisionObject::apply_central_impulse(const Vector2 &impulse) {
+	if (body) {
+		body->ApplyLinearImpulseToCenter(godot_to_box2d(impulse), true);
+	}
 }
 void Box2DCollisionObject::apply_impulse(const Vector2 &impulse, const Vector2 &position) {
+	if (body) {
+		body->ApplyLinearImpulse(godot_to_box2d(impulse), godot_to_box2d(position), true);
+	}
 }
 void Box2DCollisionObject::apply_torque_impulse(double impulse) {
+	if (body) {
+		body->ApplyTorque(godot_to_box2d(impulse), true);
+	}
 }
 void Box2DCollisionObject::apply_central_force(const Vector2 &force) {
+	if (body) {
+		body->ApplyForceToCenter(godot_to_box2d(force), true);
+	}
 }
 void Box2DCollisionObject::apply_force(const Vector2 &force, const Vector2 &position) {
+	if (body) {
+		body->ApplyForce(godot_to_box2d(force), godot_to_box2d(position), true);
+	}
 }
 void Box2DCollisionObject::apply_torque(double torque) {
+	if (body) {
+		body->ApplyTorque(godot_to_box2d(torque), true);
+	}
 }
 void Box2DCollisionObject::add_constant_central_force(const Vector2 &force) {
 	constant_force += force;
@@ -158,9 +174,10 @@ double Box2DCollisionObject::get_constant_torque() const {
 	return constant_torque;
 }
 void Box2DCollisionObject::set_sleep_state(bool enabled) {
+	body->SetAwake(enabled);
 }
 bool Box2DCollisionObject::is_sleeping() const {
-	return false;
+	return body->IsAwake();
 }
 int32_t Box2DCollisionObject::get_contact_count() const {
 	return false;

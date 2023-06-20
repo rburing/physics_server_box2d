@@ -23,7 +23,7 @@ double Box2DBody::get_priority() {
 }
 
 void Box2DBody::set_gravity_scale(double p_gravity_scale) {
-	p_gravity_scale = body_def->gravityScale;
+	body_def->gravityScale = p_gravity_scale; // no need to convert
 	if (body) {
 		body->SetGravityScale(body_def->gravityScale);
 	}
@@ -45,14 +45,10 @@ double Box2DBody::get_gravity_scale() {
 	return body_def->gravityScale; // no need to convert
 }
 double Box2DBody::get_linear_damp() {
-	double linear_damp;
-	box2d_to_godot(body_def->linearDamping, linear_damp);
-	return body_def->linearDamping;
+	return box2d_to_godot(body_def->linearDamping);
 }
 double Box2DBody::get_angular_damp() {
-	double angular_damp;
-	box2d_to_godot(body_def->angularDamping, angular_damp);
-	return angular_damp;
+	return box2d_to_godot(body_def->angularDamping);
 }
 
 void Box2DBody::wakeup() {
@@ -72,35 +68,6 @@ Box2DDirectBodyState *Box2DBody::get_direct_state() {
 		direct_state->body = this;
 	}
 	return direct_state;
-}
-
-void Box2DBody::set_linear_velocity(const Vector2 &p_linear_velocity) {
-	b2Vec2 box2d_linear_velocity;
-	godot_to_box2d(p_linear_velocity, box2d_linear_velocity);
-	if (body) {
-		body->SetLinearVelocity(box2d_linear_velocity);
-	} else {
-		body_def->linearVelocity = box2d_linear_velocity;
-	}
-}
-
-Vector2 Box2DBody::get_linear_velocity() const {
-	b2Vec2 box2d_linear_velocity = body->GetLinearVelocity();
-	Vector2 linear_velocity;
-	box2d_to_godot(box2d_linear_velocity, linear_velocity);
-	return linear_velocity;
-}
-
-void Box2DBody::set_angular_velocity(real_t p_angular_velocity) {
-	if (body) {
-		body->SetAngularVelocity(p_angular_velocity);
-	} else {
-		body_def->angularVelocity = p_angular_velocity;
-	}
-}
-
-double Box2DBody::get_angular_velocity() const {
-	return body->GetAngularVelocity();
 }
 
 void Box2DBody::set_active(bool p_active) {
@@ -274,12 +241,13 @@ void Box2DBody::call_queries() {
 void Box2DBody::set_continuous_collision_detection_mode(PhysicsServer2D::CCDMode p_mode) {
 	collision_mode = p_mode;
 	switch (collision_mode) {
-		case PhysicsServer2D::CCD_MODE_DISABLED:
-			break;
+		case PhysicsServer2D::CCD_MODE_DISABLED: {
+			body_def->bullet = false;
+		} break;
 		case PhysicsServer2D::CCD_MODE_CAST_RAY:
-			break; // bullet
 		case PhysicsServer2D::CCD_MODE_CAST_SHAPE:
-			break; // bullet
+			body_def->bullet = true;
+			break;
 	}
 }
 PhysicsServer2D::CCDMode Box2DBody::get_continuous_collision_detection_mode() const {

@@ -114,7 +114,7 @@ bool PhysicsServerBox2D::_shape_collide(const RID &p_shape_A, const Transform2D 
 	ERR_FAIL_COND_V(!shape_A, false);
 	ERR_FAIL_COND_V(!shape_B, false);
 
-	WARN_PRINT_ONCE("TODO not impl");
+	WARN_PRINT_ONCE("TODO_shape_collide");
 	return false;
 }
 
@@ -165,8 +165,9 @@ double PhysicsServerBox2D::_space_get_param(const RID &p_space, PhysicsServer2D:
 	switch (p_param) {
 		case SPACE_PARAM_SOLVER_ITERATIONS:
 			return (double)space->get_solver_iterations();
-		default:
-			WARN_PRINT_ONCE("_space_get_param only implements SPACE_PARAM_SOLVER_ITERATIONS.");
+		default: {
+			
+		}
 	}
 	return 0;
 }

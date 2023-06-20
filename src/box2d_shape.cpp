@@ -44,10 +44,8 @@ b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transfo
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	half_extents *= p_transform.get_scale();
-	b2Vec2 box2d_half_extents;
-	godot_to_box2d(half_extents, box2d_half_extents);
-	b2Vec2 box2d_origin;
-	godot_to_box2d(p_transform.get_origin(), box2d_origin);
+	b2Vec2 box2d_half_extents = godot_to_box2d(half_extents);
+	b2Vec2 box2d_origin = godot_to_box2d(p_transform.get_origin());
 	shape->SetAsBox(box2d_half_extents.x, box2d_half_extents.y, box2d_origin, p_transform.get_rotation());
 	return shape;
 }
@@ -89,10 +87,8 @@ b2Shape *Box2DShapeCapsule::get_transformed_b2Shape(int p_index, const Transform
 	} else {
 		b2PolygonShape *shape = memnew(b2PolygonShape);
 		Vector2 half_extents(radius, height * 0.5 - radius);
-		b2Vec2 box2d_half_extents;
-		godot_to_box2d(half_extents, box2d_half_extents);
-		b2Vec2 box2d_origin;
-		godot_to_box2d(p_transform.get_origin(), box2d_origin);
+		b2Vec2 box2d_half_extents = godot_to_box2d(half_extents);
+		b2Vec2 box2d_origin = godot_to_box2d(p_transform.get_origin());
 		shape->SetAsBox(box2d_half_extents.x, box2d_half_extents.y, box2d_origin, p_transform.get_rotation());
 		return shape;
 	}

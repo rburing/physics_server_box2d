@@ -61,12 +61,6 @@ public:
 
 	Box2DDirectBodyState *get_direct_state();
 
-	void set_linear_velocity(const Vector2 &p_linear_velocity) override;
-	Vector2 get_linear_velocity() const override;
-
-	void set_angular_velocity(real_t p_angular_velocity);
-	double get_angular_velocity() const override;
-
 	void set_active(bool p_active);
 	bool is_active() const;
 
