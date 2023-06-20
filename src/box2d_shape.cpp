@@ -22,7 +22,8 @@ Variant Box2DShapeCircle::get_data() const {
 b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2CircleShape *shape = memnew(b2CircleShape);
-	godot_to_box2d(radius, shape->m_radius);
+	// for now we don't support elipsys
+	godot_to_box2d(radius * p_transform.get_scale().x, shape->m_radius);
 	godot_to_box2d(p_transform.get_origin(), shape->m_p);
 	return shape;
 }
@@ -42,6 +43,7 @@ Variant Box2DShapeRectangle::get_data() const {
 b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
+	half_extents *= p_transform.get_scale();
 	b2Vec2 box2d_half_extents;
 	godot_to_box2d(half_extents, box2d_half_extents);
 	b2Vec2 box2d_origin;
@@ -202,18 +204,41 @@ b2Shape *Box2DShapeSegment::get_transformed_b2Shape(int p_index, const Transform
 /* WORLD BOUNDARY SHAPE */
 
 void Box2DShapeWorldBoundary::set_data(const Variant &p_data) {
-	// todo
+	ERR_FAIL_COND(p_data.get_type() != Variant::ARRAY);
+	Array arr = p_data;
+	ERR_FAIL_COND(arr.size() != 2);
+	normal = arr[0];
+	distance = arr[1]; // no need to bring it to box2d here as we will do it later
 	configured = true;
 }
 
 Variant Box2DShapeWorldBoundary::get_data() const {
-	// todo
-	return Variant();
+	Array data;
+	data.resize(2);
+	data[0] = normal;
+	data[1] = distance; // no need to bring it to godot here as we didn't cast this one
+	return data;
 }
 
 b2Shape *Box2DShapeWorldBoundary::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
-	// todo
-	return nullptr;
+	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
+	b2EdgeShape *shape = memnew(b2EdgeShape);
+	b2Vec2 edge_endpoints[2];
+	Vector2 right(normal.y, -normal.x);
+	Vector2 left(-right);
+	left *= 100000; // Multiply by large number
+	right *= 100000;
+	left = left + normal * distance;
+	right = right + normal * distance;
+	godot_to_box2d(p_transform.xform(left), edge_endpoints[0]);
+	godot_to_box2d(p_transform.xform(right), edge_endpoints[1]);
+	if (one_way) {
+		b2Vec2 dirV0 = edge_endpoints[0] - edge_endpoints[1];
+		shape->SetOneSided(edge_endpoints[1] + dirV0, edge_endpoints[0], edge_endpoints[1], edge_endpoints[0] - dirV0);
+	} else {
+		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
+	}
+	return shape;
 }
 
 /* SEPARATION RAY SHAPE */
@@ -229,6 +254,16 @@ Variant Box2DShapeSeparationRay::get_data() const {
 }
 
 b2Shape *Box2DShapeSeparationRay::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
-	// todo
-	return nullptr;
+	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
+	b2EdgeShape *shape = memnew(b2EdgeShape);
+	b2Vec2 edge_endpoints[2];
+	godot_to_box2d(p_transform.xform(a), edge_endpoints[0]);
+	godot_to_box2d(p_transform.xform(b), edge_endpoints[1]);
+	if (one_way) {
+		b2Vec2 dirV0 = edge_endpoints[0] - edge_endpoints[1];
+		shape->SetOneSided(edge_endpoints[1] + dirV0, edge_endpoints[0], edge_endpoints[1], edge_endpoints[0] - dirV0);
+	} else {
+		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
+	}
+	return shape;
 }

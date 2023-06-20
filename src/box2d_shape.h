@@ -118,8 +118,8 @@ public:
 };
 
 class Box2DShapeWorldBoundary : public Box2DShape {
-	Vector2 a;
-	Vector2 b;
+	Vector2 normal;
+	float distance;
 
 public:
 	virtual void set_data(const Variant &p_data) override;
