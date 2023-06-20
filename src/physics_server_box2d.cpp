@@ -149,11 +149,12 @@ void PhysicsServerBox2D::_space_set_param(const RID &p_space, PhysicsServer2D::S
 	ERR_FAIL_COND(!space_const);
 
 	switch (p_param) {
-		case SPACE_PARAM_SOLVER_ITERATIONS:{
+		case SPACE_PARAM_SOLVER_ITERATIONS: {
 			Box2DSpace *space = const_cast<Box2DSpace *>(space_const);
 			space->set_solver_iterations((int32)p_value);
-		}break;
-		default: {}
+		} break;
+		default: {
+		}
 	}
 }
 
@@ -691,51 +692,53 @@ double PhysicsServerBox2D::_body_get_collision_priority(const RID &p_body) const
 void PhysicsServerBox2D::_body_set_param(const RID &p_body, PhysicsServer2D::BodyParameter p_param, const Variant &p_value) {
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND(!body);
-	switch(p_param) {
-		case BODY_PARAM_MASS:{
+	switch (p_param) {
+		case BODY_PARAM_MASS: {
 			body->set_mass(p_value);
 		} break;
-		case BODY_PARAM_INERTIA:{
+		case BODY_PARAM_INERTIA: {
 			body->set_inertia(p_value);
 		} break;
-		case BODY_PARAM_CENTER_OF_MASS:{
+		case BODY_PARAM_CENTER_OF_MASS: {
 			body->set_center_of_mass(p_value);
 		} break;
-		case BODY_PARAM_GRAVITY_SCALE:{
+		case BODY_PARAM_GRAVITY_SCALE: {
 			body->set_gravity_scale(p_value);
 		} break;
-		case BODY_PARAM_LINEAR_DAMP:{
+		case BODY_PARAM_LINEAR_DAMP: {
 			body->set_linear_damp(p_value);
 		} break;
-		case BODY_PARAM_ANGULAR_DAMP:{
+		case BODY_PARAM_ANGULAR_DAMP: {
 			body->set_angular_damp(p_value);
 		} break;
-		default:{}
+		default: {
+		}
 	}
 }
 Variant PhysicsServerBox2D::_body_get_param(const RID &p_body, PhysicsServer2D::BodyParameter p_param) const {
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND_V(!body, Variant());
 	switch (p_param) {
-		case BODY_PARAM_MASS:{
+		case BODY_PARAM_MASS: {
 			return body->get_mass();
 		}
-		case BODY_PARAM_INERTIA:{
+		case BODY_PARAM_INERTIA: {
 			return body->get_inertia();
 		}
-		case BODY_PARAM_CENTER_OF_MASS:{
+		case BODY_PARAM_CENTER_OF_MASS: {
 			return body->get_center_of_mass();
 		}
-		case BODY_PARAM_GRAVITY_SCALE:{
+		case BODY_PARAM_GRAVITY_SCALE: {
 			return body->get_gravity_scale();
 		}
-		case BODY_PARAM_LINEAR_DAMP:{
+		case BODY_PARAM_LINEAR_DAMP: {
 			return body->get_linear_damp();
 		}
-		case BODY_PARAM_ANGULAR_DAMP:{
+		case BODY_PARAM_ANGULAR_DAMP: {
 			return body->get_angular_damp();
 		}
-		default:{}
+		default: {
+		}
 	}
 	return Variant();
 }

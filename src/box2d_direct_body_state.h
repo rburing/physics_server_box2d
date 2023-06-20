@@ -1,8 +1,8 @@
 #ifndef BOX2D_DIRECT_BODY_STATE_H
 #define BOX2D_DIRECT_BODY_STATE_H
 
-#include <godot_cpp/classes/physics_direct_space_state2d.hpp>
 #include <godot_cpp/classes/physics_direct_body_state2d_extension.hpp>
+#include <godot_cpp/classes/physics_direct_space_state2d.hpp>
 
 #include "box2d_body.h"
 

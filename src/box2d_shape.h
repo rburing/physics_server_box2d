@@ -47,7 +47,7 @@ public:
 	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) override;
 
 	Box2DShapeCircle() { type = PhysicsServer2D::SHAPE_CIRCLE; }
-	~Box2DShapeCircle() {};
+	~Box2DShapeCircle(){};
 };
 
 class Box2DShapeRectangle : public Box2DShape {

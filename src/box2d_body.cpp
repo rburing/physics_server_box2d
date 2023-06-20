@@ -273,25 +273,28 @@ void Box2DBody::call_queries() {
 
 void Box2DBody::set_continuous_collision_detection_mode(PhysicsServer2D::CCDMode p_mode) {
 	collision_mode = p_mode;
-	switch(collision_mode) {
-		case PhysicsServer2D::CCD_MODE_DISABLED: break;
-		case PhysicsServer2D::CCD_MODE_CAST_RAY: break;// bullet
-		case PhysicsServer2D::CCD_MODE_CAST_SHAPE: break;// bullet
+	switch (collision_mode) {
+		case PhysicsServer2D::CCD_MODE_DISABLED:
+			break;
+		case PhysicsServer2D::CCD_MODE_CAST_RAY:
+			break; // bullet
+		case PhysicsServer2D::CCD_MODE_CAST_SHAPE:
+			break; // bullet
 	}
 }
 PhysicsServer2D::CCDMode Box2DBody::get_continuous_collision_detection_mode() const {
 	return collision_mode;
 }
 
-void Box2DBody::add_collision_exception(Box2DBody * excepted_body) {
+void Box2DBody::add_collision_exception(Box2DBody *excepted_body) {
 	collision_exception.insert(excepted_body);
 }
-void Box2DBody::remove_collision_exception(Box2DBody * excepted_body) {
+void Box2DBody::remove_collision_exception(Box2DBody *excepted_body) {
 	collision_exception.erase(excepted_body);
 }
 TypedArray<RID> Box2DBody::get_collision_exception() {
 	TypedArray<RID> array;
-	for (Box2DBody * E : collision_exception) {
+	for (Box2DBody *E : collision_exception) {
 		array.append(E->get_self());
 	}
 	return array;

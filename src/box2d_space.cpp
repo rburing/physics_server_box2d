@@ -47,7 +47,6 @@ void Box2DSpace::call_queries() {
 	// TODO: areas
 }
 
-
 void Box2DSpace::set_solver_iterations(int32 p_iterations) {
 	solver_iterations = p_iterations;
 }
@@ -98,13 +97,11 @@ Box2DSpace::~Box2DSpace() {
 	memdelete(world);
 }
 
-
 int32_t Box2DSpace::get_contact_count() const {
 	return 0;
 }
 PackedVector2Array Box2DSpace::get_contacts() const {
 	return PackedVector2Array();
 }
-void Box2DSpace::set_debug_contacts(int32_t max_contacts){
-	
+void Box2DSpace::set_debug_contacts(int32_t max_contacts) {
 }

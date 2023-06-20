@@ -8,8 +8,8 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/callable.hpp>
 
-#include "box2d_direct_space_state.h"
 #include "box2d_direct_body_state.h"
+#include "box2d_direct_space_state.h"
 #include "physics_server_box2d.h"
 
 using namespace godot;

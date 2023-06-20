@@ -3,8 +3,8 @@
 
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/templates/self_list.hpp>
-#include <godot_cpp/variant/rid.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
+#include <godot_cpp/variant/rid.hpp>
 
 #include <box2d/b2_world.h>
 

@@ -2,14 +2,14 @@
 #define BOX2D_BODY_H
 
 #include <godot_cpp/classes/physics_server2d.hpp>
-#include <godot_cpp/variant/callable.hpp>
-#include <godot_cpp/variant/variant.hpp>
 #include <godot_cpp/templates/hash_set.hpp>
 #include <godot_cpp/templates/vector.hpp>
+#include <godot_cpp/variant/callable.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 #include "box2d_collision_object.h"
-#include "box2d_space.h"
 #include "box2d_joint.h"
+#include "box2d_space.h"
 
 using namespace godot;
 
@@ -36,6 +36,7 @@ class Box2DBody : public Box2DCollisionObject {
 	int32 max_contacts_reported;
 
 	double gravity_scale;
+
 public:
 	// Physics Server
 	void set_max_contacts_reported(int32 p_max_contacts_reported);
@@ -50,11 +51,10 @@ public:
 	double get_linear_damp();
 	double get_angular_damp();
 
-
 	void set_space(Box2DSpace *p_space) override;
 
-	void add_collision_exception(Box2DBody * excepted_body);
-	void remove_collision_exception(Box2DBody * excepted_body);
+	void add_collision_exception(Box2DBody *excepted_body);
+	void remove_collision_exception(Box2DBody *excepted_body);
 	TypedArray<RID> get_collision_exception();
 
 	void set_state_sync_callback(const Callable &p_callable);
@@ -80,7 +80,7 @@ public:
 
 	void set_continuous_collision_detection_mode(PhysicsServer2D::CCDMode mode);
 	PhysicsServer2D::CCDMode get_continuous_collision_detection_mode() const;
-	
+
 	void add_joint(Box2DJoint *p_joint);
 	void remove_joint(Box2DJoint *p_joint);
 

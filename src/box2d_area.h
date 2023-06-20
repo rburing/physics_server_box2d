@@ -14,6 +14,7 @@ class Box2DArea : public Box2DCollisionObject {
 	bool monitorable = false;
 	Callable monitor_callback;
 	Callable area_monitor_callback;
+
 public:
 	// Physics Server
 	void set_monitorable(bool monitorable);

@@ -56,6 +56,7 @@ protected:
 	Box2DDirectSpaceState *direct_space = nullptr;
 
 	b2MassData mass_data;
+
 protected:
 	void _set_transform(const Transform2D &p_transform, bool p_update_shapes = true);
 
@@ -72,7 +73,7 @@ public:
 	double get_inertia();
 	Vector2 get_center_of_mass();
 	void reset_mass_properties();
-	
+
 	// Direct Body API
 	virtual Vector2 get_total_gravity() const;
 	virtual double get_total_linear_damp() const;
@@ -119,7 +120,7 @@ public:
 	virtual PhysicsDirectSpaceState2D *get_space_state();
 
 	// Physics Server
-	
+
 	virtual void set_object_instance_id(const ObjectID &p_instance_id);
 	virtual ObjectID get_object_instance_id() const;
 	virtual void set_canvas_instance_id(const ObjectID &p_instance_id);
@@ -152,7 +153,6 @@ public:
 	void set_b2BodyDef(b2BodyDef *p_body_def);
 	b2Body *get_b2Body();
 	void set_b2Body(b2Body *p_body);
-
 
 	Box2DCollisionObject();
 	virtual ~Box2DCollisionObject();

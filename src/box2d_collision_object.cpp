@@ -418,8 +418,6 @@ void Box2DCollisionObject::set_b2BodyDef(b2BodyDef *p_body_def) { body_def = p_b
 b2Body *Box2DCollisionObject::get_b2Body() { return body; }
 void Box2DCollisionObject::set_b2Body(b2Body *p_body) { body = p_body; }
 
-
-
 void Box2DCollisionObject::_set_transform(const Transform2D &p_transform, bool p_update_shapes) {
 	if (body) {
 		Vector2 pos = p_transform.get_origin();

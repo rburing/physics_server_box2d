@@ -21,8 +21,9 @@ class Box2DJoint {
 	double damped_spring_rest_length = 0;
 	double damped_spring_stiffness = 0;
 	double damped_spring_damping = 0;
-	Box2DBody * body_a = nullptr;
-	Box2DBody * body_b = nullptr;
+	Box2DBody *body_a = nullptr;
+	Box2DBody *body_b = nullptr;
+
 protected:
 	bool configured = false;
 	PhysicsServer2D::JointType type;
@@ -34,8 +35,8 @@ public:
 	_FORCE_INLINE_ RID get_self() const { return self; }
 
 	_FORCE_INLINE_ bool is_configured() const { return configured; }
-	Box2DBody * get_body_a();
-	Box2DBody * get_body_b();
+	Box2DBody *get_body_a();
+	Box2DBody *get_body_b();
 	void set_data(const Variant &p_data);
 	Variant get_data() const;
 	void clear();
@@ -52,7 +53,7 @@ public:
 	double get_damped_spring_stiffness();
 	void set_damped_spring_damping(double p_damped_spring_damping);
 	double get_damped_spring_damping();
-	Box2DJoint() { }
+	Box2DJoint() {}
 	virtual ~Box2DJoint(){};
 };
 

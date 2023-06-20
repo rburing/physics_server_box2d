@@ -1,7 +1,7 @@
 #include "box2d_area.h"
 
 // Physics Server
-void Box2DArea::set_monitorable(bool p_monitorable){
+void Box2DArea::set_monitorable(bool p_monitorable) {
 	monitorable = p_monitorable;
 }
 void Box2DArea::set_monitor_callback(const Callable &p_callback) {
