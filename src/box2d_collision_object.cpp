@@ -10,10 +10,8 @@
 // Direct Body API
 
 void Box2DCollisionObject::reset_mass_properties() {
-	mass_data.mass = 0;
-	mass_data.center = b2Vec2();
-	mass_data.I = 0;
 	body->ResetMassData();
+	mass_data = body->GetMassData();
 }
 
 double Box2DCollisionObject::get_mass() {
@@ -433,7 +431,12 @@ RID Box2DCollisionObject::get_self() const { return self; }
 b2BodyDef *Box2DCollisionObject::get_b2BodyDef() { return body_def; }
 void Box2DCollisionObject::set_b2BodyDef(b2BodyDef *p_body_def) { body_def = p_body_def; }
 b2Body *Box2DCollisionObject::get_b2Body() { return body; }
-void Box2DCollisionObject::set_b2Body(b2Body *p_body) { body = p_body; }
+void Box2DCollisionObject::set_b2Body(b2Body *p_body) {
+	body = p_body;
+	if (body) {
+		body->SetMassData(&mass_data);
+	}
+}
 
 void Box2DCollisionObject::_set_transform(const Transform2D &p_transform, bool p_update_shapes) {
 	if (body) {

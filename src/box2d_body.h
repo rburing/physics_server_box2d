@@ -78,6 +78,8 @@ public:
 	void add_joint(Box2DJoint *p_joint);
 	void remove_joint(Box2DJoint *p_joint);
 
+	virtual HashSet<Box2DJoint *> get_joints() override;
+
 	void after_step();
 	void call_queries();
 

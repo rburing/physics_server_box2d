@@ -40,7 +40,7 @@ RID PhysicsServerBox2D::_shape_create(ShapeType p_shape) {
 			shape = memnew(Box2DShapeSeparationRay);
 		} break;
 		default: {
-			ERR_PRINT("UNSUPPORTED");
+			ERR_PRINT_ONCE("UNSUPPORTED");
 		} break;
 	}
 
@@ -166,7 +166,6 @@ double PhysicsServerBox2D::_space_get_param(const RID &p_space, PhysicsServer2D:
 		case SPACE_PARAM_SOLVER_ITERATIONS:
 			return (double)space->get_solver_iterations();
 		default: {
-			
 		}
 	}
 	return 0;
@@ -343,9 +342,11 @@ uint64_t PhysicsServerBox2D::_area_get_canvas_instance_id(const RID &p_area) con
 	return area->get_canvas_instance_id();
 }
 
-void PhysicsServerBox2D::_area_set_param(const RID &area, AreaParameter param, const Variant &value) {
-	WARN_PRINT_ONCE("TODO not impl");
-	switch (param) {
+void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_param, const Variant &p_value) {
+	Box2DArea *area = area_owner.get_or_null(p_area);
+	ERR_FAIL_COND(!area);
+	WARN_PRINT_ONCE("TODO_area_set_param");
+	switch (p_param) {
 		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
 			break;
 		case AREA_PARAM_GRAVITY:
@@ -376,7 +377,7 @@ void PhysicsServerBox2D::_area_set_transform(const RID &p_area, const Transform2
 }
 
 Variant PhysicsServerBox2D::_area_get_param(const RID &area, PhysicsServer2D::AreaParameter param) const {
-	WARN_PRINT_ONCE("TODO not impl");
+	WARN_PRINT_ONCE("TODO_area_get_param");
 	switch (param) {
 		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
 			break;
@@ -861,17 +862,16 @@ bool PhysicsServerBox2D::_body_is_omitting_force_integration(const RID &p_body) 
 void PhysicsServerBox2D::_body_set_force_integration_callback(const RID &p_body, const Callable &p_callable, const Variant &p_userdata) {
 }
 bool PhysicsServerBox2D::_body_collide_shape(const RID &p_body, int32_t p_body_shape, const RID &p_shape, const Transform2D &p_shape_xform, const Vector2 &p_motion, void *p_results, int32_t p_result_max, int32_t *p_result_count) {
-	WARN_PRINT_ONCE("TODO");
+	WARN_PRINT_ONCE("TODO_body_collide_shape");
 	return false;
 }
 void PhysicsServerBox2D::_body_set_pickable(const RID &p_body, bool p_pickable) {
-	WARN_PRINT_ONCE("TODO");
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND(!body);
 	return body->set_pickable(p_pickable);
 }
 bool PhysicsServerBox2D::_body_test_motion(const RID &p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *p_result) const {
-	WARN_PRINT_ONCE("TODO");
+	WARN_PRINT_ONCE("TODO_body_test_motion");
 	return false;
 }
 
@@ -890,23 +890,30 @@ void PhysicsServerBox2D::_joint_clear(const RID &p_joint) {
 	joint->clear();
 }
 void PhysicsServerBox2D::_joint_set_param(const RID &p_joint, PhysicsServer2D::JointParam p_param, double p_value) {
+	Box2DJoint *joint = joint_owner.get_or_null(p_joint);
+	ERR_FAIL_COND(!joint);
 	switch (p_param) {
 		case JOINT_PARAM_BIAS:
+			joint->set_bias(p_value);
 			break;
 		case JOINT_PARAM_MAX_BIAS:
+			joint->set_max_bias(p_value);
 			break;
 		case JOINT_PARAM_MAX_FORCE:
+			joint->set_max_force(p_value);
 			break;
 	}
 }
 double PhysicsServerBox2D::_joint_get_param(const RID &p_joint, PhysicsServer2D::JointParam p_param) const {
+	Box2DJoint *joint = joint_owner.get_or_null(p_joint);
+	ERR_FAIL_COND_V(!joint, 0);
 	switch (p_param) {
 		case JOINT_PARAM_BIAS:
-			break;
+			return joint->get_bias();
 		case JOINT_PARAM_MAX_BIAS:
-			break;
+			return joint->get_max_bias();
 		case JOINT_PARAM_MAX_FORCE:
-			break;
+			return joint->get_max_force();
 	}
 	return 0;
 }
@@ -930,6 +937,10 @@ void PhysicsServerBox2D::_joint_make_pin(const RID &p_joint, const Vector2 &p_an
 	joint->make_pin(p_anchor, body_a, body_b);
 	body_a->add_joint(joint);
 	body_b->add_joint(joint);
+	Box2DSpace *space = body_a->get_space();
+	ERR_FAIL_COND(!space);
+	joint->set_space(space);
+	space->create_joint(joint);
 }
 
 void PhysicsServerBox2D::_joint_make_groove(const RID &p_joint, const Vector2 &p_a_groove1, const Vector2 &p_a_groove2, const Vector2 &p_b_anchor, const RID &p_body_a, const RID &p_body_b) {
@@ -942,6 +953,10 @@ void PhysicsServerBox2D::_joint_make_groove(const RID &p_joint, const Vector2 &p
 	joint->make_groove(p_a_groove1, p_a_groove2, p_b_anchor, body_a, body_b);
 	body_a->add_joint(joint);
 	body_b->add_joint(joint);
+	Box2DSpace *space = body_a->get_space();
+	ERR_FAIL_COND(!space);
+	joint->set_space(space);
+	space->create_joint(joint);
 }
 void PhysicsServerBox2D::_joint_make_damped_spring(const RID &p_joint, const Vector2 &p_anchor_a, const Vector2 &p_anchor_b, const RID &p_body_a, const RID &p_body_b) {
 	Box2DJoint *joint = joint_owner.get_or_null(p_joint);
@@ -953,6 +968,10 @@ void PhysicsServerBox2D::_joint_make_damped_spring(const RID &p_joint, const Vec
 	joint->make_damped_spring(p_anchor_a, p_anchor_b, body_a, body_b);
 	body_a->add_joint(joint);
 	body_b->add_joint(joint);
+	Box2DSpace *space = body_a->get_space();
+	ERR_FAIL_COND(!space);
+	joint->set_space(space);
+	space->create_joint(joint);
 }
 void PhysicsServerBox2D::_pin_joint_set_param(const RID &p_joint, PhysicsServer2D::PinJointParam p_param, double p_value) {
 	Box2DJoint *joint = joint_owner.get_or_null(p_joint);
@@ -978,13 +997,13 @@ void PhysicsServerBox2D::_damped_spring_joint_set_param(const RID &p_joint, Phys
 	ERR_FAIL_COND(!joint);
 	switch (p_param) {
 		case DAMPED_SPRING_REST_LENGTH: {
-			return joint->set_damped_spring_rest_length(p_value);
+			joint->set_damped_spring_rest_length(p_value);
 		} break;
 		case DAMPED_SPRING_STIFFNESS: {
-			return joint->set_damped_spring_stiffness(p_value);
+			joint->set_damped_spring_stiffness(p_value);
 		} break;
 		case DAMPED_SPRING_DAMPING: {
-			return joint->set_damped_spring_damping(p_value);
+			joint->set_damped_spring_damping(p_value);
 		} break;
 	}
 }
@@ -1038,6 +1057,10 @@ void PhysicsServerBox2D::_free_rid(const RID &p_rid) {
 		active_spaces.erase(space);
 		space_owner.free(p_rid);
 		memdelete(space);
+	} else if (joint_owner.owns(p_rid)) {
+		Box2DJoint *joint = joint_owner.get_or_null(p_rid);
+		joint_owner.free(p_rid);
+		memdelete(joint);
 	}
 }
 
@@ -1098,10 +1121,10 @@ int PhysicsServerBox2D::_get_process_info(ProcessInfo process_info) {
 			return active_body_count;
 		} break;
 		case INFO_COLLISION_PAIRS: {
-			ERR_PRINT("TODO not implemented");
+			ERR_PRINT_ONCE("TODO_get_process_info_INFO_COLLISION_PAIRS");
 		} break;
 		case INFO_ISLAND_COUNT: {
-			ERR_PRINT("TODO not implemented");
+			ERR_PRINT_ONCE("TODO_get_process_info_INFO_ISLAND_COUNT");
 		} break;
 	}
 	return 0;

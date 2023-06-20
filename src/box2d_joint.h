@@ -12,6 +12,7 @@
 
 using namespace godot;
 
+class Box2DSpace;
 class Box2DBody;
 
 class Box2DJoint {
@@ -21,8 +22,22 @@ class Box2DJoint {
 	double damped_spring_rest_length = 0;
 	double damped_spring_stiffness = 0;
 	double damped_spring_damping = 0;
+	float groove_lower_translation = 0;
+	float groove_upper_translation = 0;
+	double bias = 0;
+	double max_bias = 0;
+	double max_force = 0;
 	Box2DBody *body_a = nullptr;
 	Box2DBody *body_b = nullptr;
+
+	b2Joint *joint = nullptr;
+	b2JointDef *joint_def = nullptr;
+
+	Box2DSpace *space = nullptr;
+	b2Vec2 anchor_a;
+	b2Vec2 anchor_b;
+
+	void _recreate_joint();
 
 protected:
 	bool configured = false;
@@ -37,7 +52,12 @@ public:
 	_FORCE_INLINE_ bool is_configured() const { return configured; }
 	Box2DBody *get_body_a();
 	Box2DBody *get_body_b();
-	void set_data(const Variant &p_data);
+	void set_bias(double p_data);
+	void set_max_bias(double p_data);
+	void set_max_force(double p_data);
+	double get_bias();
+	double get_max_bias();
+	double get_max_force();
 	Variant get_data() const;
 	void clear();
 	void set_disable_collisions(bool disable_collisions);
@@ -53,8 +73,16 @@ public:
 	double get_damped_spring_stiffness();
 	void set_damped_spring_damping(double p_damped_spring_damping);
 	double get_damped_spring_damping();
-	Box2DJoint() {}
-	virtual ~Box2DJoint(){};
+
+	b2JointDef *get_b2JointDef();
+	void set_b2JointDef(b2JointDef *p_joint_def);
+	b2Joint *get_b2Joint();
+	void set_b2Joint(b2Joint *p_joint);
+
+	void set_space(Box2DSpace *p_space);
+
+	Box2DJoint();
+	virtual ~Box2DJoint();
 };
 
 #endif // BOX2D_JOINT_H

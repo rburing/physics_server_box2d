@@ -275,6 +275,10 @@ void Box2DBody::remove_joint(Box2DJoint *p_joint) {
 	joints.erase(p_joint);
 }
 
+HashSet<Box2DJoint *> Box2DBody::get_joints() {
+	return joints;
+}
+
 Box2DBody::Box2DBody() :
 		Box2DCollisionObject(TYPE_BODY),
 		active_list(this),

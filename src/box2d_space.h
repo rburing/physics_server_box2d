@@ -13,6 +13,7 @@ using namespace godot;
 class Box2DCollisionObject;
 class Box2DBody;
 class Box2DDirectSpaceState;
+class Box2DJoint;
 
 class Box2DSpace {
 private:
@@ -51,6 +52,8 @@ public:
 	void add_object(Box2DCollisionObject *p_object);
 	void remove_object(Box2DCollisionObject *p_object);
 
+	void create_joint(Box2DJoint *joint);
+	void remove_joint(Box2DJoint *joint);
 	void step(float p_step);
 	void call_queries();
 

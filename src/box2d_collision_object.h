@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/physics_server2d.hpp>
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/templates/hash_set.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/rid.hpp>
 
@@ -15,6 +16,7 @@
 using namespace godot;
 
 class Box2DDirectSpaceState;
+class Box2DJoint;
 
 class Box2DCollisionObject {
 public:
@@ -153,6 +155,7 @@ public:
 	void set_b2BodyDef(b2BodyDef *p_body_def);
 	b2Body *get_b2Body();
 	void set_b2Body(b2Body *p_body);
+	virtual HashSet<Box2DJoint *> get_joints() { return HashSet<Box2DJoint *>(); }
 
 	Box2DCollisionObject();
 	virtual ~Box2DCollisionObject();

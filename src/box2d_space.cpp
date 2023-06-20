@@ -25,9 +25,29 @@ void Box2DSpace::add_object(Box2DCollisionObject *p_object) {
 	p_object->set_b2Body(world->CreateBody(p_object->get_b2BodyDef()));
 }
 
+void Box2DSpace::create_joint(Box2DJoint *joint) {
+	remove_joint(joint);
+	// create joint once and if both body exist
+	if (joint->is_configured()) {
+		b2JointDef *joint_def = joint->get_b2JointDef();
+		joint->set_b2Joint(world->CreateJoint(joint_def));
+	}
+}
+
+void Box2DSpace::remove_joint(Box2DJoint *joint) {
+	if (joint->get_b2Joint()) {
+		world->DestroyJoint(joint->get_b2Joint());
+		joint->set_b2Joint(nullptr);
+	}
+}
+
 void Box2DSpace::remove_object(Box2DCollisionObject *p_object) {
 	ERR_FAIL_COND(!p_object);
 	world->DestroyBody(p_object->get_b2Body());
+	p_object->set_b2Body(nullptr);
+	for (Box2DJoint *joint : p_object->get_joints()) {
+		joint->set_b2Joint(nullptr); // joint is destroyed when destroying body
+	}
 }
 
 void Box2DSpace::body_add_to_state_query_list(SelfList<Box2DBody> *p_body) {
