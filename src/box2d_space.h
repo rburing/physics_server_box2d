@@ -28,7 +28,6 @@ private:
 	bool locked = false;
 
 	double solver_iterations = 8;
-	double step_interval = 0;
 
 	Box2DDirectSpaceState *direct_state = nullptr;
 
@@ -61,7 +60,9 @@ public:
 	void lock() { locked = true; }
 	void unlock() { locked = false; }
 
-	int get_active_body_count();
+	int32_t get_active_body_count();
+	int32_t get_collision_pairs();
+	int32_t get_island_count();
 
 	int32_t get_contact_count() const;
 	PackedVector2Array get_contacts() const;

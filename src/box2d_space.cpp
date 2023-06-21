@@ -3,6 +3,7 @@
 #include <godot_cpp/core/memory.hpp>
 
 #include <box2d/b2_body.h>
+#include <box2d/b2_contact.h>
 
 #include "box2d_body.h"
 #include "box2d_collision_object.h"
@@ -76,7 +77,6 @@ int32 Box2DSpace::get_solver_iterations() const {
 }
 
 void Box2DSpace::step(float p_step) {
-	step_interval = p_step;
 	const int32 velocityIterations = solver_iterations + 2;
 	const int32 positionIterations = solver_iterations;
 
@@ -93,7 +93,7 @@ void Box2DSpace::step(float p_step) {
 }
 
 double Box2DSpace::get_step() {
-	return step_interval;
+	return world->GetProfile().step;
 }
 
 int Box2DSpace::get_active_body_count() {
@@ -117,11 +117,37 @@ Box2DSpace::~Box2DSpace() {
 	memdelete(world);
 }
 
+
+int32_t Box2DSpace::get_collision_pairs() {
+	return world->GetContactCount();
+}
+int32_t Box2DSpace::get_island_count() {
+	return 0; // not sure if this is exposed
+}
+
 int32_t Box2DSpace::get_contact_count() const {
-	return 0;
+	int32 contact_count = world->GetContactCount();
+	int32_t contact_total = 0;
+	b2Contact * contacts = world->GetContactList();
+	for (int i=0; i<contact_count; i++) {
+		contact_total += contacts->GetManifold()->pointCount;
+	}
+	return contact_total;
 }
 PackedVector2Array Box2DSpace::get_contacts() const {
-	return PackedVector2Array();
+	PackedVector2Array vector_array;
+	int32 contact_count = world->GetContactCount();
+	int32_t contact_total = 0;
+	b2Contact * contacts = world->GetContactList();
+	for (int i=0; i<contact_count; i++) {
+		b2WorldManifold worldManifold;
+		contacts->GetWorldManifold(&worldManifold);
+		for (int j=0;j<contacts->GetManifold()->pointCount;j++) {
+			
+			vector_array.append(box2d_to_godot(worldManifold.points[j]));
+		}
+	}
+	return vector_array;
 }
 void Box2DSpace::set_debug_contacts(int32_t max_contacts) {
 }

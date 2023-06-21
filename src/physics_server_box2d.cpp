@@ -1121,10 +1121,20 @@ int PhysicsServerBox2D::_get_process_info(ProcessInfo process_info) {
 			return active_body_count;
 		} break;
 		case INFO_COLLISION_PAIRS: {
-			ERR_PRINT_ONCE("TODO_get_process_info_INFO_COLLISION_PAIRS");
+			int collision_pairs = 0;
+			for (const Box2DSpace *E : active_spaces) {
+				Box2DSpace *space = const_cast<Box2DSpace *>(E);
+				collision_pairs += space->get_collision_pairs();
+			}
+			return collision_pairs;
 		} break;
 		case INFO_ISLAND_COUNT: {
-			ERR_PRINT_ONCE("TODO_get_process_info_INFO_ISLAND_COUNT");
+			int islands = 0;
+			for (const Box2DSpace *E : active_spaces) {
+				Box2DSpace *space = const_cast<Box2DSpace *>(E);
+				islands += space->get_island_count();
+			}
+			return islands;
 		} break;
 	}
 	return 0;
