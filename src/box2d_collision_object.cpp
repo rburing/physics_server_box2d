@@ -24,6 +24,16 @@ Vector2 Box2DCollisionObject::get_center_of_mass() {
 	return box2d_to_godot(mass_data.center);
 }
 
+void Box2DCollisionObject::set_bounce(double p_bounce) {
+	bounce = p_bounce;
+	_clear_fixtures();
+	_update_shapes();
+}
+void Box2DCollisionObject::set_friction(double p_friction) {
+	friction = p_friction;
+	_clear_fixtures();
+	_update_shapes();
+}
 void Box2DCollisionObject::set_mass(double p_mass) {
 	mass_data.mass = p_mass;
 	if (body) {
@@ -41,6 +51,13 @@ void Box2DCollisionObject::set_center_of_mass(Vector2 p_center_of_mass) {
 	if (body) {
 		body->SetMassData(&mass_data);
 	}
+}
+
+double Box2DCollisionObject::get_bounce() {
+	return bounce;
+}
+double Box2DCollisionObject::get_friction() {
+	return friction;
 }
 
 Vector2 Box2DCollisionObject::get_total_gravity() const {
@@ -232,6 +249,8 @@ PhysicsDirectSpaceState2D *Box2DCollisionObject::get_space_state() {
 
 void Box2DCollisionObject::set_collision_layer(uint32_t layer) {
 	collision_layer = layer;
+	_clear_fixtures();
+	_update_shapes();
 }
 
 uint32_t Box2DCollisionObject::get_collision_layer() const {
@@ -239,6 +258,8 @@ uint32_t Box2DCollisionObject::get_collision_layer() const {
 }
 void Box2DCollisionObject::set_collision_mask(uint32_t layer) {
 	collision_mask = layer;
+	_clear_fixtures();
+	_update_shapes();
 }
 
 uint32_t Box2DCollisionObject::get_collision_mask() const {
@@ -346,20 +367,24 @@ void Box2DCollisionObject::remove_shape(int p_index) {
 	// TODO: (queue) update
 }
 
+void Box2DCollisionObject::_clear_fixtures() {
+	for (int i = 0; i < shapes.size(); i++) {
+		Shape &shape = shapes.write[i];
+		for (int j = 0; j < shape.fixtures.size(); j++) {
+			body->DestroyFixture(shape.fixtures[j]);
+			shape.fixtures.write[j] = nullptr;
+		}
+		shape.fixtures.clear();
+	}
+}
+
 void Box2DCollisionObject::_set_space(Box2DSpace *p_space) {
 	if (space) {
 		// NOTE: Remember the transform by copying it from the b2Body to the b2BodyDef.
 		body_def->position = body->GetPosition();
 		body_def->angle = body->GetAngle();
 
-		for (int i = 0; i < shapes.size(); i++) {
-			Shape &shape = shapes.write[i];
-			for (int j = 0; j < shape.fixtures.size(); j++) {
-				body->DestroyFixture(shape.fixtures[j]);
-				shape.fixtures.write[j] = nullptr;
-			}
-			shape.fixtures.clear();
-		}
+		_clear_fixtures();
 		space->remove_object(this);
 	}
 	space = p_space;
@@ -402,6 +427,10 @@ void Box2DCollisionObject::_update_shapes() {
 				b2FixtureDef fixture_def;
 				fixture_def.shape = s.shape->get_transformed_b2Shape(j, s.xform, s.one_way_collision);
 				fixture_def.density = 1.0f;
+				fixture_def.filter.maskBits = collision_mask;
+				fixture_def.filter.categoryBits = collision_layer;
+				fixture_def.friction = friction;
+				fixture_def.restitution = bounce;
 				fixture_def.isSensor = type == Type::TYPE_AREA;
 				fixture_def.userData.shape_idx = i;
 				fixture_def.userData.box2d_fixture_idx = j;

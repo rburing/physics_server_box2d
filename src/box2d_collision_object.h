@@ -45,15 +45,18 @@ protected:
 
 	bool pickable = false;
 
-	uint32_t collision_layer;
-	uint32_t collision_mask;
+	uint32_t collision_layer = 1;
+	uint32_t collision_mask = 1;
 
 	Vector<Shape> shapes;
 
 	Vector2 constant_force;
 	Vector2 constant_force_position;
-	double constant_torque;
+	double constant_torque = 0;
+	double friction = 0;
+	double bounce = 0;
 
+	void _clear_fixtures();
 	void _update_shapes();
 	Box2DDirectSpaceState *direct_space = nullptr;
 
@@ -67,10 +70,14 @@ protected:
 	Box2DCollisionObject(Type p_type);
 
 public:
+	void set_bounce(double p_bounce);
+	void set_friction(double p_friction);
 	void set_mass(double p_mass);
 	void set_inertia(double p_inertia);
 	void set_center_of_mass(Vector2 p_center_of_mass);
 
+	double get_bounce();
+	double get_friction();
 	double get_mass();
 	double get_inertia();
 	Vector2 get_center_of_mass();

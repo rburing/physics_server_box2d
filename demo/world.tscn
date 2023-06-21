@@ -1,36 +1,40 @@
-[gd_scene load_steps=3 format=3 uid="uid://bkd3jvy83di6t"]
+[gd_scene load_steps=5 format=3 uid="uid://bkd3jvy83di6t"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_565db"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ruwi5"]
 
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_w80ti"]
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ojsky"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_kpwdm"]
+a = Vector2(55.4879, -251.8)
+b = Vector2(-120.103, 520.293)
 
 [node name="World" type="Node2D"]
 
 [node name="RigidBody2D" type="RigidBody2D" parent="."]
-position = Vector2(0, -62)
+position = Vector2(-27, -222)
+collision_layer = 3
+mass = 3.0
+physics_material_override = SubResource("PhysicsMaterial_565db")
 
 [node name="Camera2D" type="Camera2D" parent="RigidBody2D"]
-
-[node name="PinJoint2D" type="PinJoint2D" parent="RigidBody2D"]
-position = Vector2(-7, -48)
-node_a = NodePath("..")
-node_b = NodePath("../../RigidBody2D2")
-softness = 0.43
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
 shape = SubResource("RectangleShape2D_ruwi5")
 
 [node name="RigidBody2D2" type="RigidBody2D" parent="."]
-position = Vector2(-17, -110)
+position = Vector2(59, -91)
+rotation = 2.4934
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
 shape = SubResource("RectangleShape2D_ruwi5")
 
-[node name="GrooveJoint2D" type="GrooveJoint2D" parent="RigidBody2D2"]
-
-[node name="DampedSpringJoint2D" type="DampedSpringJoint2D" parent="RigidBody2D2"]
-
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(6, -75)
+physics_material_override = SubResource("PhysicsMaterial_ojsky")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-shape = SubResource("WorldBoundaryShape2D_w80ti")
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(3, -97)
+rotation = 1.12303
+shape = SubResource("SegmentShape2D_kpwdm")

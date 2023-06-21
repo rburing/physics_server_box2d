@@ -695,6 +695,12 @@ void PhysicsServerBox2D::_body_set_param(const RID &p_body, PhysicsServer2D::Bod
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND(!body);
 	switch (p_param) {
+		case BODY_PARAM_BOUNCE: {
+			body->set_bounce(p_value);
+		}
+		case BODY_PARAM_FRICTION: {
+			body->set_friction(p_value);
+		}
 		case BODY_PARAM_MASS: {
 			body->set_mass(p_value);
 		} break;
@@ -721,6 +727,12 @@ Variant PhysicsServerBox2D::_body_get_param(const RID &p_body, PhysicsServer2D::
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND_V(!body, Variant());
 	switch (p_param) {
+		case BODY_PARAM_BOUNCE: {
+			return body->get_bounce();
+		}
+		case BODY_PARAM_FRICTION: {
+			return body->get_friction();
+		}
 		case BODY_PARAM_MASS: {
 			return body->get_mass();
 		}
