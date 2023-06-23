@@ -53,7 +53,7 @@ protected:
 	Vector2 constant_force;
 	Vector2 constant_force_position;
 	double constant_torque = 0;
-	double friction = 0;
+	double friction = 1;
 	double bounce = 0;
 
 	void _clear_fixtures();

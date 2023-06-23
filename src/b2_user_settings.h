@@ -32,10 +32,12 @@ struct B2_API b2FixtureUserData {
 	b2FixtureUserData() {
 		shape_idx = 0;
 		box2d_fixture_idx = 0;
+		type = 0;
 	}
 
 	int shape_idx;
 	int box2d_fixture_idx;
+	int type;
 };
 
 /// You can define this to inject whatever data you want in b2Joint

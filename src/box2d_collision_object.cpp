@@ -5,13 +5,18 @@
 
 #include <godot_cpp/core/memory.hpp>
 
+#include <box2d/b2_contact.h>
 #include <box2d/b2_fixture.h>
 
 // Direct Body API
 
 void Box2DCollisionObject::reset_mass_properties() {
-	body->ResetMassData();
-	mass_data = body->GetMassData();
+	mass_data.mass = 1;
+	mass_data.I = 0;
+	mass_data.center = b2Vec2();
+	if (body) {
+		body->SetMassData(&mass_data);
+	}
 }
 
 double Box2DCollisionObject::get_mass() {
@@ -26,13 +31,17 @@ Vector2 Box2DCollisionObject::get_center_of_mass() {
 
 void Box2DCollisionObject::set_bounce(double p_bounce) {
 	bounce = p_bounce;
-	_clear_fixtures();
-	_update_shapes();
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
 }
 void Box2DCollisionObject::set_friction(double p_friction) {
 	friction = p_friction;
-	_clear_fixtures();
-	_update_shapes();
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
 }
 void Box2DCollisionObject::set_mass(double p_mass) {
 	mass_data.mass = p_mass;
@@ -73,7 +82,11 @@ double Box2DCollisionObject::get_total_angular_damp() const {
 }
 
 Vector2 Box2DCollisionObject::get_center_of_mass() const {
-	return Vector2();
+	if (body) {
+		return box2d_to_godot(mass_data.center + body->GetPosition());
+	} else {
+		return box2d_to_godot(mass_data.center + body_def->position);
+	}
 }
 
 Vector2 Box2DCollisionObject::get_center_of_mass_local() const {
@@ -81,13 +94,13 @@ Vector2 Box2DCollisionObject::get_center_of_mass_local() const {
 }
 
 double Box2DCollisionObject::get_inverse_mass() const {
-	if (mass_data.mass == 0) {
+	if (mass_data.mass <= 0) {
 		return 0;
 	}
 	return 1.0 / mass_data.mass;
 }
 double Box2DCollisionObject::get_inverse_inertia() const {
-	if (mass_data.I == 0) {
+	if (mass_data.I <= 0) {
 		return 0;
 	}
 	return 1.0 / mass_data.I;
@@ -189,21 +202,54 @@ double Box2DCollisionObject::get_constant_torque() const {
 	return constant_torque;
 }
 void Box2DCollisionObject::set_sleep_state(bool enabled) {
-	body->SetAwake(enabled);
+	body->SetAwake(!enabled);
 }
 bool Box2DCollisionObject::is_sleeping() const {
-	return body->IsAwake();
+	return !body->IsAwake();
 }
 int32_t Box2DCollisionObject::get_contact_count() const {
-	return false;
+	b2ContactEdge *contacts = body->GetContactList();
+	int32 contacts_count = 0;
+	while (contacts) {
+		contacts_count += contacts->contact->GetManifold()->pointCount;
+		contacts = contacts->next;
+	}
+	return contacts_count;
 }
 Vector2 Box2DCollisionObject::get_contact_local_position(int32_t contact_idx) const {
+	b2ContactEdge *contacts = body->GetContactList();
+	int32 contacts_count = 0;
+	while (contacts) {
+		contacts_count += contacts->contact->GetManifold()->pointCount;
+		if (contacts_count >= contact_idx) {
+			return box2d_to_godot(contacts->contact->GetManifold()->points[contacts_count - contact_idx].localPoint);
+		}
+		contacts = contacts->next;
+	}
 	return Vector2();
 }
 Vector2 Box2DCollisionObject::get_contact_local_normal(int32_t contact_idx) const {
+	b2ContactEdge *contacts = body->GetContactList();
+	int32 contacts_count = 0;
+	while (contacts) {
+		contacts_count += contacts->contact->GetManifold()->pointCount;
+		if (contacts_count >= contact_idx) {
+			return box2d_to_godot(contacts->contact->GetManifold()->localNormal);
+		}
+		contacts = contacts->next;
+	}
 	return Vector2();
 }
 int32_t Box2DCollisionObject::get_contact_local_shape(int32_t contact_idx) const {
+	b2ContactEdge *contacts = body->GetContactList();
+	int32 contacts_count = 0;
+	while (contacts) {
+		contacts_count += contacts->contact->GetManifold()->pointCount;
+		if (contacts_count >= contact_idx) {
+			return contacts->contact->GetFixtureA()->GetUserData().shape_idx;
+		}
+		contacts = contacts->next;
+	}
 	return 0;
 }
 RID Box2DCollisionObject::get_contact_collider(int32_t contact_idx) const {
@@ -249,8 +295,10 @@ PhysicsDirectSpaceState2D *Box2DCollisionObject::get_space_state() {
 
 void Box2DCollisionObject::set_collision_layer(uint32_t layer) {
 	collision_layer = layer;
-	_clear_fixtures();
-	_update_shapes();
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
 }
 
 uint32_t Box2DCollisionObject::get_collision_layer() const {
@@ -258,8 +306,10 @@ uint32_t Box2DCollisionObject::get_collision_layer() const {
 }
 void Box2DCollisionObject::set_collision_mask(uint32_t layer) {
 	collision_mask = layer;
-	_clear_fixtures();
-	_update_shapes();
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
 }
 
 uint32_t Box2DCollisionObject::get_collision_mask() const {
@@ -268,12 +318,28 @@ uint32_t Box2DCollisionObject::get_collision_mask() const {
 
 void Box2DCollisionObject::set_pickable(bool p_pickable) {
 	pickable = p_pickable;
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
 }
 
-void Box2DCollisionObject::set_object_instance_id(const ObjectID &p_instance_id) { object_instance_id = p_instance_id; }
+void Box2DCollisionObject::set_object_instance_id(const ObjectID &p_instance_id) {
+	object_instance_id = p_instance_id;
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
+}
 ObjectID Box2DCollisionObject::get_object_instance_id() const { return object_instance_id; }
 
-void Box2DCollisionObject::set_canvas_instance_id(const ObjectID &p_instance_id) { canvas_instance_id = p_instance_id; }
+void Box2DCollisionObject::set_canvas_instance_id(const ObjectID &p_instance_id) {
+	canvas_instance_id = p_instance_id;
+	if (body) {
+		_clear_fixtures();
+		_update_shapes();
+	}
+}
 ObjectID Box2DCollisionObject::get_canvas_instance_id() const { return canvas_instance_id; }
 
 Box2DSpace *Box2DCollisionObject::get_space() const { return space; }
@@ -434,6 +500,7 @@ void Box2DCollisionObject::_update_shapes() {
 				fixture_def.isSensor = type == Type::TYPE_AREA;
 				fixture_def.userData.shape_idx = i;
 				fixture_def.userData.box2d_fixture_idx = j;
+				fixture_def.userData.type = s.shape->get_type();
 				s.fixtures.write[j] = body->CreateFixture(&fixture_def);
 			}
 		}
@@ -446,6 +513,9 @@ Box2DCollisionObject::Box2DCollisionObject(Type p_type) {
 	type = p_type;
 	body_def = memnew(b2BodyDef);
 	body_def->userData.collision_object = this;
+	mass_data.mass = 1;
+	mass_data.I = 0;
+	mass_data.center = b2Vec2();
 }
 
 Box2DCollisionObject::~Box2DCollisionObject() {
