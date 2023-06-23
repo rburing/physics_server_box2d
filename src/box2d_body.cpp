@@ -82,15 +82,11 @@ void Box2DBody::set_active(bool p_active) {
 			// Static bodies can't be active.
 			active = false;
 		} else if (get_space()) {
-			if (body) {
-				body->SetAwake(true);
-			}
+			set_sleep_state(true);
 			get_space()->body_add_to_active_list(&active_list);
 		}
 	} else if (get_space()) {
-		if (body) {
-			body->SetAwake(false);
-		}
+		set_sleep_state(false);
 		get_space()->body_remove_from_active_list(&active_list);
 	}
 }

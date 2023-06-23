@@ -202,12 +202,17 @@ double Box2DCollisionObject::get_constant_torque() const {
 	return constant_torque;
 }
 void Box2DCollisionObject::set_sleep_state(bool enabled) {
-	body->SetAwake(!enabled);
+	if (body) {
+		body->SetAwake(!enabled);
+	}
 }
 bool Box2DCollisionObject::is_sleeping() const {
 	return !body->IsAwake();
 }
 int32_t Box2DCollisionObject::get_contact_count() const {
+	if (!body) {
+		return 0;
+	}
 	b2ContactEdge *contacts = body->GetContactList();
 	int32 contacts_count = 0;
 	while (contacts) {
@@ -217,6 +222,9 @@ int32_t Box2DCollisionObject::get_contact_count() const {
 	return contacts_count;
 }
 Vector2 Box2DCollisionObject::get_contact_local_position(int32_t contact_idx) const {
+	if (!body) {
+		return Vector2();
+	}
 	b2ContactEdge *contacts = body->GetContactList();
 	int32 contacts_count = 0;
 	while (contacts) {
@@ -229,6 +237,9 @@ Vector2 Box2DCollisionObject::get_contact_local_position(int32_t contact_idx) co
 	return Vector2();
 }
 Vector2 Box2DCollisionObject::get_contact_local_normal(int32_t contact_idx) const {
+	if (!body) {
+		return Vector2();
+	}
 	b2ContactEdge *contacts = body->GetContactList();
 	int32 contacts_count = 0;
 	while (contacts) {
@@ -241,6 +252,9 @@ Vector2 Box2DCollisionObject::get_contact_local_normal(int32_t contact_idx) cons
 	return Vector2();
 }
 int32_t Box2DCollisionObject::get_contact_local_shape(int32_t contact_idx) const {
+	if (!body) {
+		return 0;
+	}
 	b2ContactEdge *contacts = body->GetContactList();
 	int32 contacts_count = 0;
 	while (contacts) {
@@ -385,7 +399,9 @@ void Box2DCollisionObject::set_shape_disabled(int p_index, bool p_disabled) {
 	}
 
 	for (int j = 0; j < shape.fixtures.size(); j++) {
-		body->DestroyFixture(shape.fixtures[j]);
+		if (body) {
+			body->DestroyFixture(shape.fixtures[j]);
+		}
 		shape.fixtures.write[j] = nullptr;
 	}
 	shape.fixtures.clear();
@@ -423,7 +439,9 @@ void Box2DCollisionObject::remove_shape(int p_index) {
 		Shape &shape = shapes.write[i];
 		for (int j = 0; j < shape.fixtures.size(); j++) {
 			// should never get here with a null owner
-			body->DestroyFixture(shape.fixtures[j]);
+			if (body) {
+				body->DestroyFixture(shape.fixtures[j]);
+			}
 			shape.fixtures.write[j] = nullptr;
 		}
 		shape.fixtures.clear();
@@ -437,7 +455,9 @@ void Box2DCollisionObject::_clear_fixtures() {
 	for (int i = 0; i < shapes.size(); i++) {
 		Shape &shape = shapes.write[i];
 		for (int j = 0; j < shape.fixtures.size(); j++) {
-			body->DestroyFixture(shape.fixtures[j]);
+			if (body) {
+				body->DestroyFixture(shape.fixtures[j]);
+			}
 			shape.fixtures.write[j] = nullptr;
 		}
 		shape.fixtures.clear();
@@ -447,8 +467,10 @@ void Box2DCollisionObject::_clear_fixtures() {
 void Box2DCollisionObject::_set_space(Box2DSpace *p_space) {
 	if (space) {
 		// NOTE: Remember the transform by copying it from the b2Body to the b2BodyDef.
-		body_def->position = body->GetPosition();
-		body_def->angle = body->GetAngle();
+		if (body) {
+			body_def->position = body->GetPosition();
+			body_def->angle = body->GetAngle();
+		}
 
 		_clear_fixtures();
 		space->remove_object(this);
@@ -473,7 +495,7 @@ const Transform2D &Box2DCollisionObject::get_shape_transform(int p_index) const 
 // MISC
 
 void Box2DCollisionObject::_update_shapes() {
-	if (!space) {
+	if (!space || !body) {
 		return;
 	}
 

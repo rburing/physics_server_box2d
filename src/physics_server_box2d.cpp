@@ -40,7 +40,7 @@ RID PhysicsServerBox2D::_shape_create(ShapeType p_shape) {
 			shape = memnew(Box2DShapeSeparationRay);
 		} break;
 		default: {
-			ERR_PRINT_ONCE("UNSUPPORTED");
+			ERR_FAIL_V_MSG(RID(), "UNSUPPORTED");
 		} break;
 	}
 
@@ -344,8 +344,6 @@ uint64_t PhysicsServerBox2D::_area_get_canvas_instance_id(const RID &p_area) con
 
 void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_param, const Variant &p_value) {
 	Box2DArea *area = area_owner.get_or_null(p_area);
-	ERR_FAIL_COND(!area);
-	WARN_PRINT_ONCE("TODO_area_set_param");
 	switch (p_param) {
 		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
 			break;
@@ -377,7 +375,6 @@ void PhysicsServerBox2D::_area_set_transform(const RID &p_area, const Transform2
 }
 
 Variant PhysicsServerBox2D::_area_get_param(const RID &area, PhysicsServer2D::AreaParameter param) const {
-	WARN_PRINT_ONCE("TODO_area_get_param");
 	switch (param) {
 		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
 			break;
