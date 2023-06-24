@@ -109,14 +109,13 @@ Box2DDirectSpaceState *Box2DSpace::get_direct_state() {
 }
 
 Box2DSpace::Box2DSpace() {
-	b2Vec2 gravity(0.0f, 10.0f);
+	b2Vec2 gravity(0.0f, 9.8f);
 	world = memnew(b2World(gravity));
 }
 
 Box2DSpace::~Box2DSpace() {
 	memdelete(world);
 }
-
 
 int32_t Box2DSpace::get_collision_pairs() {
 	return world->GetContactCount();
@@ -128,8 +127,8 @@ int32_t Box2DSpace::get_island_count() {
 int32_t Box2DSpace::get_contact_count() const {
 	int32 contact_count = world->GetContactCount();
 	int32_t contact_total = 0;
-	b2Contact * contacts = world->GetContactList();
-	for (int i=0; i<contact_count; i++) {
+	b2Contact *contacts = world->GetContactList();
+	for (int i = 0; i < contact_count; i++) {
 		contact_total += contacts->GetManifold()->pointCount;
 	}
 	return contact_total;
@@ -138,12 +137,11 @@ PackedVector2Array Box2DSpace::get_contacts() const {
 	PackedVector2Array vector_array;
 	int32 contact_count = world->GetContactCount();
 	int32_t contact_total = 0;
-	b2Contact * contacts = world->GetContactList();
-	for (int i=0; i<contact_count; i++) {
+	b2Contact *contacts = world->GetContactList();
+	for (int i = 0; i < contact_count; i++) {
 		b2WorldManifold worldManifold;
 		contacts->GetWorldManifold(&worldManifold);
-		for (int j=0;j<contacts->GetManifold()->pointCount;j++) {
-			
+		for (int j = 0; j < contacts->GetManifold()->pointCount; j++) {
 			vector_array.append(box2d_to_godot(worldManifold.points[j]));
 		}
 	}

@@ -16,20 +16,21 @@ class Box2DArea : public Box2DCollisionObject {
 	Callable area_monitor_callback;
 	int32_t gravity_override_mode = 0;
 	double gravity = 10;
-	b2Vec2 gravity_vector = b2Vec2(0,-1);
+	b2Vec2 gravity_vector = b2Vec2(0, -1);
 	int32_t linear_damp_mode = 0;
 	double linear_damp;
 	int32_t angular_damp_mode = 0;
 	double angular_damp;
+
 public:
 	// Physics Server
 	void set_monitorable(bool monitorable);
 	void set_monitor_callback(const Callable &callback);
 	void set_area_monitor_callback(const Callable &callback);
 
-	void set_transform(const Transform2D &p_transform) override;
+	virtual void set_transform(const Transform2D &p_transform) override;
 
-	void set_space(Box2DSpace *p_space) override;
+	virtual void set_space(Box2DSpace *p_space) override;
 
 	void set_gravity_override_mode(int32_t p_value);
 	void set_gravity(double p_value);

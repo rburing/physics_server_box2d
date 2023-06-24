@@ -17,6 +17,7 @@ using namespace godot;
 
 class Box2DDirectSpaceState;
 class Box2DJoint;
+class Box2DArea;
 
 class Box2DCollisionObject {
 public:
@@ -34,6 +35,7 @@ protected:
 	b2Body *body = nullptr;
 	b2BodyDef *body_def = nullptr;
 	Box2DSpace *space = nullptr;
+	Box2DArea *area = nullptr;
 
 	struct Shape {
 		Transform2D xform;
@@ -167,9 +169,12 @@ public:
 	virtual void set_space(Box2DSpace *p_space) = 0;
 
 	// MISC
+	Object *get_object() const;
 	Type get_type() const;
 	void set_self(const RID &p_self);
 	RID get_self() const;
+	virtual void set_area(Box2DArea *p_area);
+	virtual Box2DArea *get_area();
 
 	b2BodyDef *get_b2BodyDef();
 	void set_b2BodyDef(b2BodyDef *p_body_def);

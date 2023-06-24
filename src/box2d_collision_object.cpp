@@ -1,5 +1,6 @@
 #include "box2d_collision_object.h"
 #include "b2_user_settings.h"
+#include "box2d_area.h"
 #include "box2d_direct_space_state.h"
 #include "box2d_type_conversions.h"
 
@@ -31,10 +32,10 @@ void Box2DCollisionObject::set_angular_damp(double p_angular_damp) {
 		body->SetAngularDamping(body_def->angularDamping);
 	}
 }
-double Box2DCollisionObject::get_linear_damp() const{
+double Box2DCollisionObject::get_linear_damp() const {
 	return box2d_to_godot(body_def->linearDamping);
 }
-double Box2DCollisionObject::get_angular_damp() const{
+double Box2DCollisionObject::get_angular_damp() const {
 	return box2d_to_godot(body_def->angularDamping);
 }
 
@@ -42,14 +43,14 @@ void Box2DCollisionObject::set_priority(double p_priority) {
 	priority = p_priority;
 }
 
-double Box2DCollisionObject::get_priority() const{
+double Box2DCollisionObject::get_priority() const {
 	return priority;
 }
 
-double Box2DCollisionObject::get_mass() const{
+double Box2DCollisionObject::get_mass() const {
 	return mass_data.mass; // no need to convert
 }
-double Box2DCollisionObject::get_inertia() const{
+double Box2DCollisionObject::get_inertia() const {
 	return mass_data.I; // no need to convert
 }
 
@@ -86,15 +87,18 @@ void Box2DCollisionObject::set_center_of_mass(Vector2 p_center_of_mass) {
 	}
 }
 
-double Box2DCollisionObject::get_bounce() const{
+double Box2DCollisionObject::get_bounce() const {
 	return bounce;
 }
-double Box2DCollisionObject::get_friction() const{
+double Box2DCollisionObject::get_friction() const {
 	return friction;
 }
 
 Vector2 Box2DCollisionObject::get_total_gravity() const {
-	return Vector2(); // get gravity from area
+	if (area->get_gravity_override_mode() == 0) {
+		return Vector2(0.0f, 9.8f);
+	}
+	return area->get_gravity() * area->get_gravity_vector();
 }
 
 double Box2DCollisionObject::get_total_linear_damp() const {
@@ -233,7 +237,7 @@ void Box2DCollisionObject::set_sleep_state(bool enabled) {
 bool Box2DCollisionObject::is_sleeping() const {
 	return !body->IsAwake();
 }
-Box2DCollisionObject::ContactEdgeData Box2DCollisionObject::_get_contact_edge_data(int32_t contact_idx) const{
+Box2DCollisionObject::ContactEdgeData Box2DCollisionObject::_get_contact_edge_data(int32_t contact_idx) const {
 	if (!body) {
 		return ContactEdgeData();
 	}
@@ -243,7 +247,7 @@ Box2DCollisionObject::ContactEdgeData Box2DCollisionObject::_get_contact_edge_da
 	while (contacts) {
 		contacts_count += contacts->contact->GetManifold()->pointCount;
 		if (contacts_count > contact_idx) {
-			return ContactEdgeData{contacts, contacts_count - contact_idx - 1};
+			return ContactEdgeData{ contacts, contacts_count - contact_idx - 1 };
 		}
 		contacts = contacts->next;
 	}
@@ -290,7 +294,7 @@ RID Box2DCollisionObject::get_contact_collider(int32_t contact_idx) const {
 	if (!data.edge) {
 		return RID();
 	}
-	b2BodyUserData* user_data = (b2BodyUserData*)&data.edge->other->GetUserData();
+	b2BodyUserData *user_data = (b2BodyUserData *)&data.edge->other->GetUserData();
 	return user_data->collision_object->get_self();
 }
 Vector2 Box2DCollisionObject::get_contact_collider_position(int32_t contact_idx) const {
@@ -305,7 +309,7 @@ uint64_t Box2DCollisionObject::get_contact_collider_id(int32_t contact_idx) cons
 	if (!data.edge) {
 		return 0;
 	}
-	b2BodyUserData* user_data = (b2BodyUserData*)&data.edge->other->GetUserData();
+	b2BodyUserData *user_data = (b2BodyUserData *)&data.edge->other->GetUserData();
 	return user_data->collision_object->get_object_instance_id();
 }
 Object *Box2DCollisionObject::get_contact_collider_object(int32_t contact_idx) const {
@@ -315,7 +319,7 @@ Object *Box2DCollisionObject::get_contact_collider_object(int32_t contact_idx) c
 int32_t Box2DCollisionObject::get_contact_collider_shape(int32_t contact_idx) const {
 	ContactEdgeData data = _get_contact_edge_data(contact_idx);
 	if (!data.edge) {
-		return 0;
+		return -1;
 	}
 	return data.edge->contact->GetFixtureB()->GetUserData().shape_idx;
 }
@@ -391,6 +395,11 @@ void Box2DCollisionObject::set_object_instance_id(const ObjectID &p_instance_id)
 	}
 }
 ObjectID Box2DCollisionObject::get_object_instance_id() const { return object_instance_id; }
+
+Object *Box2DCollisionObject::get_object() const {
+	ObjectID id = ObjectID(object_instance_id);
+	return ObjectDB::get_instance(id);
+}
 
 void Box2DCollisionObject::set_canvas_instance_id(const ObjectID &p_instance_id) {
 	canvas_instance_id = p_instance_id;
@@ -593,6 +602,13 @@ Box2DCollisionObject::Type Box2DCollisionObject::get_type() const { return type;
 
 void Box2DCollisionObject::set_self(const RID &p_self) { self = p_self; }
 RID Box2DCollisionObject::get_self() const { return self; }
+
+void Box2DCollisionObject::set_area(Box2DArea *p_area) {
+	area = p_area;
+}
+Box2DArea *Box2DCollisionObject::get_area() {
+	return area;
+}
 
 b2BodyDef *Box2DCollisionObject::get_b2BodyDef() { return body_def; }
 void Box2DCollisionObject::set_b2BodyDef(b2BodyDef *p_body_def) { body_def = p_body_def; }
