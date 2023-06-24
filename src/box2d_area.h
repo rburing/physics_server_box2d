@@ -40,6 +40,7 @@ public:
 
 	int32_t get_gravity_override_mode() const;
 	double get_gravity() const;
+	b2Vec2 get_b2_gravity() const;
 	Vector2 get_gravity_vector() const;
 	int32_t get_linear_damp_override_mode() const;
 	int32_t get_angular_damp_override_mode() const;

@@ -13,7 +13,6 @@ void godot_to_box2d(const Vector2 &p_vector, b2Vec2 &r_box2d_vector) {
 	r_box2d_vector.y = p_vector.y * G_TO_B_FACTOR;
 }
 
-
 float godot_to_box2d(const float &p_value) {
 	return p_value * G_TO_B_FACTOR;
 }
@@ -39,12 +38,12 @@ void box2d_to_godot(const b2Vec2 &p_box2d_vector, Vector2 &r_vector) {
 	r_vector.y = B_TO_G_FACTOR * p_box2d_vector.y;
 }
 
-float box2d_to_godot(const float &p_box2d_value){
+float box2d_to_godot(const float &p_box2d_value) {
 	return B_TO_G_FACTOR * p_box2d_value;
 }
-double box2d_to_godot_d(const float &p_box2d_value){
+double box2d_to_godot_d(const float &p_box2d_value) {
 	return (double)(B_TO_G_FACTOR * p_box2d_value);
 }
-Vector2 box2d_to_godot(const b2Vec2 &p_box2d_vector){
+Vector2 box2d_to_godot(const b2Vec2 &p_box2d_vector) {
 	return Vector2(B_TO_G_FACTOR * p_box2d_vector.x, B_TO_G_FACTOR * p_box2d_vector.y);
 }

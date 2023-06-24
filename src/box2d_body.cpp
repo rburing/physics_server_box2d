@@ -143,6 +143,9 @@ void Box2DBody::set_state(PhysicsServer2D::BodyState p_state, const Variant &p_v
 		} break;
 		case PhysicsServer2D::BODY_STATE_CAN_SLEEP: {
 			can_sleep = p_variant;
+			if (body) {
+				body->SetSleepingAllowed(can_sleep);
+			}
 			if (mode >= PhysicsServer2D::BODY_MODE_RIGID && !active && !can_sleep) {
 				set_active(true);
 			}

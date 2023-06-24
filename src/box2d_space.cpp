@@ -80,10 +80,17 @@ void Box2DSpace::step(float p_step) {
 	const int32 velocityIterations = solver_iterations + 2;
 	const int32 positionIterations = solver_iterations;
 
-	world->Step(p_step, velocityIterations, positionIterations);
-
 	const SelfList<Box2DBody>::List *body_list = &get_active_body_list();
 	const SelfList<Box2DBody> *b = body_list->first();
+	while (b) {
+		b->self()->before_step();
+		b = b->next();
+	}
+
+	world->Step(p_step, velocityIterations, positionIterations);
+
+	body_list = &get_active_body_list();
+	b = body_list->first();
 	active_body_count = 0;
 	while (b) {
 		active_body_count++;

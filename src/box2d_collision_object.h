@@ -53,8 +53,8 @@ protected:
 
 	Vector<Shape> shapes;
 
-	Vector2 constant_force;
-	Vector2 constant_force_position;
+	b2Vec2 constant_force;
+	b2Vec2 constant_force_position;
 	double constant_torque = 0;
 	double friction = 1;
 	double bounce = 0;
@@ -182,6 +182,7 @@ public:
 	void set_b2Body(b2Body *p_body);
 	virtual HashSet<Box2DJoint *> get_joints() { return HashSet<Box2DJoint *>(); }
 
+	void before_step();
 	Box2DCollisionObject();
 	virtual ~Box2DCollisionObject();
 };

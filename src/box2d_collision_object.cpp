@@ -206,28 +206,28 @@ void Box2DCollisionObject::apply_torque(double torque) {
 	}
 }
 void Box2DCollisionObject::add_constant_central_force(const Vector2 &force) {
-	constant_force += force;
+	constant_force += godot_to_box2d(force);
 	// TODO set position to center
 	//constant_force_position = position;
 }
 void Box2DCollisionObject::add_constant_force(const Vector2 &force, const Vector2 &position) {
-	constant_force += force;
-	constant_force_position = position;
+	constant_force += godot_to_box2d(force);
+	constant_force_position = godot_to_box2d(position);
 }
 void Box2DCollisionObject::add_constant_torque(double torque) {
 	constant_torque += torque;
 }
 void Box2DCollisionObject::set_constant_force(const Vector2 &force) {
-	constant_force = force;
+	constant_force = godot_to_box2d(force);
 }
 Vector2 Box2DCollisionObject::get_constant_force() const {
-	return constant_force;
+	return box2d_to_godot(constant_force);
 }
 void Box2DCollisionObject::set_constant_torque(double torque) {
-	constant_torque = torque;
+	constant_torque = godot_to_box2d(torque);
 }
 double Box2DCollisionObject::get_constant_torque() const {
-	return constant_torque;
+	return box2d_to_godot(constant_torque);
 }
 void Box2DCollisionObject::set_sleep_state(bool enabled) {
 	if (body) {
@@ -584,6 +584,22 @@ void Box2DCollisionObject::_update_shapes() {
 		//space->get_broadphase()->move(s.bpid, shape_aabb);
 	}
 }
+void Box2DCollisionObject::before_step() {
+	if (body) {
+		if (area->get_gravity_override_mode() != 0) {
+			// custom gravity
+			body->ApplyForceToCenter(body->GetMass() * area->get_b2_gravity(), true);
+		}
+		if (constant_force != b2Vec2_zero) {
+			// constant force
+			body->ApplyForce(constant_force, constant_force_position, true);
+		}
+		if (constant_torque != 0) {
+			// constant torque
+			body->ApplyTorque(constant_torque, true);
+		}
+	}
+}
 
 Box2DCollisionObject::Box2DCollisionObject(Type p_type) {
 	type = p_type;
@@ -615,6 +631,7 @@ void Box2DCollisionObject::set_b2BodyDef(b2BodyDef *p_body_def) { body_def = p_b
 b2Body *Box2DCollisionObject::get_b2Body() { return body; }
 void Box2DCollisionObject::set_b2Body(b2Body *p_body) {
 	body = p_body;
+	// set additional properties here
 	if (body) {
 		body->SetMassData(&mass_data);
 	}

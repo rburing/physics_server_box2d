@@ -57,6 +57,9 @@ int32_t Box2DArea::get_gravity_override_mode() const {
 double Box2DArea::get_gravity() const {
 	return gravity * 100.0f;
 }
+b2Vec2 Box2DArea::get_b2_gravity() const {
+	return gravity * gravity_vector;
+}
 Vector2 Box2DArea::get_gravity_vector() const {
 	return Vector2(gravity_vector.x, gravity_vector.y);
 }
