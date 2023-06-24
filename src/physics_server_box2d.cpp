@@ -344,27 +344,37 @@ uint64_t PhysicsServerBox2D::_area_get_canvas_instance_id(const RID &p_area) con
 
 void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_param, const Variant &p_value) {
 	Box2DArea *area = area_owner.get_or_null(p_area);
+	if (!area) {
+		area = &default_area;
+	}
 	switch (p_param) {
-		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
-			break;
-		case AREA_PARAM_GRAVITY:
-			break;
-		case AREA_PARAM_GRAVITY_VECTOR:
-			break;
-		case AREA_PARAM_GRAVITY_IS_POINT:
-			break;
-		case AREA_PARAM_GRAVITY_POINT_UNIT_DISTANCE:
-			break;
-		case AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE:
-			break;
-		case AREA_PARAM_LINEAR_DAMP:
-			break;
+		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:{
+			area->set_gravity_override_mode(p_value);
+		}break;
+		case AREA_PARAM_GRAVITY:{
+			area->set_gravity(p_value);
+		}break;
+		case AREA_PARAM_GRAVITY_VECTOR:{
+			area->set_gravity_vector(p_value);
+		}break;
+		case AREA_PARAM_GRAVITY_IS_POINT:{}break;
+		case AREA_PARAM_GRAVITY_POINT_UNIT_DISTANCE:{}break;
+		case AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE:{
+			area->set_linear_damp_override_mode(p_value);
+		}break;
+		case AREA_PARAM_LINEAR_DAMP:{
+			area->set_linear_damp(p_value);
+		}break;
 		case AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE:
-			break;
-		case AREA_PARAM_ANGULAR_DAMP:
-			break;
-		case AREA_PARAM_PRIORITY:
-			break;
+		{
+			area->set_angular_damp_override_mode(p_value);
+		}break;
+		case AREA_PARAM_ANGULAR_DAMP:{
+			area->set_angular_damp(p_value);
+		}break;
+		case AREA_PARAM_PRIORITY:{
+			area->set_priority(p_value);
+		}break;
 	}
 }
 
@@ -374,28 +384,40 @@ void PhysicsServerBox2D::_area_set_transform(const RID &p_area, const Transform2
 	area->set_transform(p_transform);
 }
 
-Variant PhysicsServerBox2D::_area_get_param(const RID &area, PhysicsServer2D::AreaParameter param) const {
-	switch (param) {
-		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:
+Variant PhysicsServerBox2D::_area_get_param(const RID &p_area, PhysicsServer2D::AreaParameter p_param) const {
+	const Box2DArea *area = area_owner.get_or_null(p_area);
+	if (!area) {
+		area = &default_area;
+	}
+	switch (p_param) {
+		case AREA_PARAM_GRAVITY_OVERRIDE_MODE:{
+			return area->get_gravity_override_mode();
+		}break;
+		case AREA_PARAM_GRAVITY:{
+			return area->get_gravity();
+		}break;
+		case AREA_PARAM_GRAVITY_VECTOR:{
+			return area->get_gravity_vector();
+		}break;
+		case AREA_PARAM_GRAVITY_IS_POINT:{}
 			break;
-		case AREA_PARAM_GRAVITY:
+		case AREA_PARAM_GRAVITY_POINT_UNIT_DISTANCE:{}
 			break;
-		case AREA_PARAM_GRAVITY_VECTOR:
-			break;
-		case AREA_PARAM_GRAVITY_IS_POINT:
-			break;
-		case AREA_PARAM_GRAVITY_POINT_UNIT_DISTANCE:
-			break;
-		case AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE:
-			break;
-		case AREA_PARAM_LINEAR_DAMP:
-			break;
-		case AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE:
-			break;
-		case AREA_PARAM_ANGULAR_DAMP:
-			break;
-		case AREA_PARAM_PRIORITY:
-			break;
+		case AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE:{
+			return area->get_linear_damp_override_mode();
+		}break;
+		case AREA_PARAM_LINEAR_DAMP:{
+			return area->get_linear_damp();
+		}break;
+		case AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE:{
+			return area->get_angular_damp_override_mode();
+		}break;
+		case AREA_PARAM_ANGULAR_DAMP:{
+			return area->get_angular_damp();
+		}break;
+		case AREA_PARAM_PRIORITY:{
+			return area->get_priority();
+		}break;
 	}
 	return Variant();
 }

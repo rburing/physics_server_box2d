@@ -19,14 +19,38 @@ void Box2DCollisionObject::reset_mass_properties() {
 	}
 }
 
-double Box2DCollisionObject::get_mass() {
+void Box2DCollisionObject::set_linear_damp(double p_linear_damp) {
+	godot_to_box2d(p_linear_damp, body_def->linearDamping);
+	if (body) {
+		body->SetLinearDamping(body_def->linearDamping);
+	}
+}
+void Box2DCollisionObject::set_angular_damp(double p_angular_damp) {
+	godot_to_box2d(p_angular_damp, body_def->angularDamping);
+	if (body) {
+		body->SetAngularDamping(body_def->angularDamping);
+	}
+}
+double Box2DCollisionObject::get_linear_damp() const{
+	return box2d_to_godot(body_def->linearDamping);
+}
+double Box2DCollisionObject::get_angular_damp() const{
+	return box2d_to_godot(body_def->angularDamping);
+}
+
+void Box2DCollisionObject::set_priority(double p_priority) {
+	priority = p_priority;
+}
+
+double Box2DCollisionObject::get_priority() const{
+	return priority;
+}
+
+double Box2DCollisionObject::get_mass() const{
 	return mass_data.mass; // no need to convert
 }
-double Box2DCollisionObject::get_inertia() {
+double Box2DCollisionObject::get_inertia() const{
 	return mass_data.I; // no need to convert
-}
-Vector2 Box2DCollisionObject::get_center_of_mass() {
-	return box2d_to_godot(mass_data.center);
 }
 
 void Box2DCollisionObject::set_bounce(double p_bounce) {
@@ -62,10 +86,10 @@ void Box2DCollisionObject::set_center_of_mass(Vector2 p_center_of_mass) {
 	}
 }
 
-double Box2DCollisionObject::get_bounce() {
+double Box2DCollisionObject::get_bounce() const{
 	return bounce;
 }
-double Box2DCollisionObject::get_friction() {
+double Box2DCollisionObject::get_friction() const{
 	return friction;
 }
 

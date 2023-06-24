@@ -32,7 +32,6 @@ class Box2DBody : public Box2DCollisionObject {
 
 	Box2DDirectBodyState *direct_state = nullptr;
 	HashSet<Box2DJoint *> joints;
-	double priority;
 	int32 max_contacts_reported;
 
 	double gravity_scale;
@@ -40,16 +39,10 @@ class Box2DBody : public Box2DCollisionObject {
 public:
 	// Physics Server
 	void set_max_contacts_reported(int32 p_max_contacts_reported);
-	void set_priority(double p_priority);
 	void set_gravity_scale(double p_gravity_scale);
-	void set_linear_damp(double p_linear_damp);
-	void set_angular_damp(double p_angular_damp);
 
 	int32 get_max_contacts_reported();
-	double get_priority();
 	double get_gravity_scale();
-	double get_linear_damp();
-	double get_angular_damp();
 
 	void set_space(Box2DSpace *p_space) override;
 

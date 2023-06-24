@@ -43,6 +43,7 @@ protected:
 		bool one_way_collision = false;
 	};
 
+	double priority;
 	bool pickable = false;
 
 	uint32_t collision_layer = 1;
@@ -70,17 +71,22 @@ protected:
 	Box2DCollisionObject(Type p_type);
 
 public:
+	void set_linear_damp(double p_linear_damp);
+	void set_angular_damp(double p_angular_damp);
+	void set_priority(double p_priority);
 	void set_bounce(double p_bounce);
 	void set_friction(double p_friction);
 	void set_mass(double p_mass);
 	void set_inertia(double p_inertia);
 	void set_center_of_mass(Vector2 p_center_of_mass);
 
-	double get_bounce();
-	double get_friction();
-	double get_mass();
-	double get_inertia();
-	Vector2 get_center_of_mass();
+	double get_linear_damp() const;
+	double get_angular_damp() const;
+	double get_priority() const;
+	double get_bounce() const;
+	double get_friction() const;
+	double get_mass() const;
+	double get_inertia() const;
 	void reset_mass_properties();
 
 	// Direct Body API

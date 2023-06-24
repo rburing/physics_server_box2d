@@ -14,41 +14,15 @@ int32 Box2DBody::get_max_contacts_reported() {
 	return max_contacts_reported;
 }
 
-void Box2DBody::set_priority(double p_priority) {
-	priority = p_priority;
-}
-
-double Box2DBody::get_priority() {
-	return priority;
-}
-
 void Box2DBody::set_gravity_scale(double p_gravity_scale) {
 	body_def->gravityScale = p_gravity_scale; // no need to convert
 	if (body) {
 		body->SetGravityScale(body_def->gravityScale);
 	}
 }
-void Box2DBody::set_linear_damp(double p_linear_damp) {
-	godot_to_box2d(p_linear_damp, body_def->linearDamping);
-	if (body) {
-		body->SetLinearDamping(body_def->linearDamping);
-	}
-}
-void Box2DBody::set_angular_damp(double p_angular_damp) {
-	godot_to_box2d(p_angular_damp, body_def->angularDamping);
-	if (body) {
-		body->SetAngularDamping(body_def->angularDamping);
-	}
-}
 
 double Box2DBody::get_gravity_scale() {
 	return body_def->gravityScale; // no need to convert
-}
-double Box2DBody::get_linear_damp() {
-	return box2d_to_godot(body_def->linearDamping);
-}
-double Box2DBody::get_angular_damp() {
-	return box2d_to_godot(body_def->angularDamping);
 }
 
 void Box2DBody::wakeup() {
