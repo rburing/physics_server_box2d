@@ -63,6 +63,13 @@ protected:
 
 	b2MassData mass_data;
 
+	struct ContactEdgeData {
+		b2ContactEdge *edge;
+		int32_t point_idx;
+	};
+
+	ContactEdgeData _get_contact_edge_data(int32_t contact_idx) const;
+
 protected:
 	void _set_transform(const Transform2D &p_transform, bool p_update_shapes = true);
 

@@ -30,7 +30,7 @@ struct B2_API b2BodyUserData {
 
 struct B2_API b2FixtureUserData {
 	b2FixtureUserData() {
-		shape_idx = 0;
+		shape_idx = -1;
 		box2d_fixture_idx = 0;
 		type = 0;
 	}

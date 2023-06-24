@@ -233,6 +233,23 @@ void Box2DCollisionObject::set_sleep_state(bool enabled) {
 bool Box2DCollisionObject::is_sleeping() const {
 	return !body->IsAwake();
 }
+Box2DCollisionObject::ContactEdgeData Box2DCollisionObject::_get_contact_edge_data(int32_t contact_idx) const{
+	if (!body) {
+		return ContactEdgeData();
+	}
+	b2ContactEdge *contacts = body->GetContactList();
+	int32 contacts_count = 0;
+	b2WorldManifold worldManifold;
+	while (contacts) {
+		contacts_count += contacts->contact->GetManifold()->pointCount;
+		if (contacts_count > contact_idx) {
+			return ContactEdgeData{contacts, contacts_count - contact_idx - 1};
+		}
+		contacts = contacts->next;
+	}
+	return ContactEdgeData();
+}
+
 int32_t Box2DCollisionObject::get_contact_count() const {
 	if (!body) {
 		return 0;
@@ -246,70 +263,74 @@ int32_t Box2DCollisionObject::get_contact_count() const {
 	return contacts_count;
 }
 Vector2 Box2DCollisionObject::get_contact_local_position(int32_t contact_idx) const {
-	if (!body) {
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
 		return Vector2();
 	}
-	b2ContactEdge *contacts = body->GetContactList();
-	int32 contacts_count = 0;
-	while (contacts) {
-		contacts_count += contacts->contact->GetManifold()->pointCount;
-		if (contacts_count >= contact_idx) {
-			return box2d_to_godot(contacts->contact->GetManifold()->points[contacts_count - contact_idx].localPoint);
-		}
-		contacts = contacts->next;
-	}
-	return Vector2();
+	b2WorldManifold worldManifold;
+	data.edge->contact->GetWorldManifold(&worldManifold);
+	return box2d_to_godot(worldManifold.points[data.point_idx]);
 }
 Vector2 Box2DCollisionObject::get_contact_local_normal(int32_t contact_idx) const {
-	if (!body) {
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
 		return Vector2();
 	}
-	b2ContactEdge *contacts = body->GetContactList();
-	int32 contacts_count = 0;
-	while (contacts) {
-		contacts_count += contacts->contact->GetManifold()->pointCount;
-		if (contacts_count >= contact_idx) {
-			return box2d_to_godot(contacts->contact->GetManifold()->localNormal);
-		}
-		contacts = contacts->next;
-	}
-	return Vector2();
+	return box2d_to_godot(data.edge->contact->GetManifold()->localNormal);
 }
 int32_t Box2DCollisionObject::get_contact_local_shape(int32_t contact_idx) const {
-	if (!body) {
-		return 0;
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return -1;
 	}
-	b2ContactEdge *contacts = body->GetContactList();
-	int32 contacts_count = 0;
-	while (contacts) {
-		contacts_count += contacts->contact->GetManifold()->pointCount;
-		if (contacts_count >= contact_idx) {
-			return contacts->contact->GetFixtureA()->GetUserData().shape_idx;
-		}
-		contacts = contacts->next;
-	}
-	return 0;
+	return data.edge->contact->GetFixtureA()->GetUserData().shape_idx;
 }
 RID Box2DCollisionObject::get_contact_collider(int32_t contact_idx) const {
-	return RID();
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return RID();
+	}
+	b2BodyUserData* user_data = (b2BodyUserData*)&data.edge->other->GetUserData();
+	return user_data->collision_object->get_self();
 }
 Vector2 Box2DCollisionObject::get_contact_collider_position(int32_t contact_idx) const {
-	return Vector2();
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return Vector2();
+	}
+	return box2d_to_godot(data.edge->other->GetPosition());
 }
 uint64_t Box2DCollisionObject::get_contact_collider_id(int32_t contact_idx) const {
-	return 0;
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return 0;
+	}
+	b2BodyUserData* user_data = (b2BodyUserData*)&data.edge->other->GetUserData();
+	return user_data->collision_object->get_object_instance_id();
 }
 Object *Box2DCollisionObject::get_contact_collider_object(int32_t contact_idx) const {
-	return nullptr;
+	ObjectID id = ObjectID(get_contact_collider_id(contact_idx));
+	return ObjectDB::get_instance(id);
 }
 int32_t Box2DCollisionObject::get_contact_collider_shape(int32_t contact_idx) const {
-	return 0;
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return 0;
+	}
+	return data.edge->contact->GetFixtureB()->GetUserData().shape_idx;
 }
 Vector2 Box2DCollisionObject::get_contact_collider_velocity_at_position(int32_t contact_idx) const {
-	return Vector2();
+	ContactEdgeData data = _get_contact_edge_data(contact_idx);
+	if (!data.edge) {
+		return Vector2();
+	}
+	b2WorldManifold worldManifold;
+	data.edge->contact->GetWorldManifold(&worldManifold);
+	b2Vec2 world_point = worldManifold.points[data.point_idx];
+	return box2d_to_godot(data.edge->other->GetLinearVelocityFromWorldPoint(world_point));
 }
 Vector2 Box2DCollisionObject::get_contact_impulse(int32_t contact_idx) const {
-	return Vector2();
+	return get_contact_local_normal(contact_idx) * get_step();
 }
 double Box2DCollisionObject::get_step() const {
 	Box2DSpace *space = get_space();
