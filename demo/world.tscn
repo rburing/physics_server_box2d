@@ -1,21 +1,40 @@
-[gd_scene load_steps=3 format=3 uid="uid://bkd3jvy83di6t"]
+[gd_scene load_steps=5 format=3 uid="uid://bkd3jvy83di6t"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0osea"]
-size = Vector2(500, 20)
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_565db"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ruwi5"]
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ojsky"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_kpwdm"]
+a = Vector2(55.4879, -251.8)
+b = Vector2(-120.103, 520.293)
+
 [node name="World" type="Node2D"]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-shape = SubResource("RectangleShape2D_0osea")
-
 [node name="RigidBody2D" type="RigidBody2D" parent="."]
-position = Vector2(0, -62)
+position = Vector2(-27, -222)
+collision_layer = 3
+mass = 3.0
+physics_material_override = SubResource("PhysicsMaterial_565db")
+
+[node name="Camera2D" type="Camera2D" parent="RigidBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
 shape = SubResource("RectangleShape2D_ruwi5")
 
-[node name="Camera2D" type="Camera2D" parent="RigidBody2D"]
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+position = Vector2(59, -91)
+rotation = 2.4934
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
+shape = SubResource("RectangleShape2D_ruwi5")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(6, -75)
+physics_material_override = SubResource("PhysicsMaterial_ojsky")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(3, -97)
+rotation = 1.12303
+shape = SubResource("SegmentShape2D_kpwdm")
