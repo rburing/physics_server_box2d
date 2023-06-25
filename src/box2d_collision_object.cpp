@@ -141,6 +141,7 @@ double Box2DCollisionObject::get_inverse_inertia() const {
 }
 void Box2DCollisionObject::set_linear_velocity(const Vector2 &p_linear_velocity) {
 	b2Vec2 box2d_linear_velocity = godot_to_box2d(p_linear_velocity);
+	body_def->linearVelocity = box2d_linear_velocity;
 	if (body) {
 		body->SetLinearVelocity(box2d_linear_velocity);
 	}
@@ -154,6 +155,7 @@ Vector2 Box2DCollisionObject::get_linear_velocity() const {
 }
 void Box2DCollisionObject::set_angular_velocity(double p_velocity) {
 	float angularVelocity = godot_to_box2d(p_velocity);
+	body_def->angularVelocity = angularVelocity;
 	if (body) {
 		body->SetAngularVelocity(angularVelocity);
 	}
@@ -613,19 +615,6 @@ void Box2DCollisionObject::before_step() {
 	}
 }
 
-Box2DCollisionObject::Box2DCollisionObject(Type p_type) {
-	type = p_type;
-	body_def = memnew(b2BodyDef);
-	body_def->userData.collision_object = this;
-	mass_data.mass = 1;
-	mass_data.I = 0;
-	mass_data.center = b2Vec2();
-}
-
-Box2DCollisionObject::~Box2DCollisionObject() {
-	memdelete(body_def);
-}
-
 Box2DCollisionObject::Type Box2DCollisionObject::get_type() const { return type; }
 
 void Box2DCollisionObject::set_self(const RID &p_self) { self = p_self; }
@@ -782,4 +771,22 @@ void Box2DCollisionObject::_set_transform(const Transform2D &p_transform, bool p
 	if (p_update_shapes) {
 		_update_shapes();
 	}
+}
+
+Box2DCollisionObject::Box2DCollisionObject(Type p_type) {
+	type = p_type;
+	body_def = memnew(b2BodyDef);
+	body_def->userData.collision_object = this;
+	mass_data.mass = 1;
+	mass_data.I = 0;
+	mass_data.center = b2Vec2();
+}
+
+Box2DCollisionObject::~Box2DCollisionObject() {
+	for (Box2DArea *area : areas) {
+		if (area) {
+			area->remove_body(this);
+		}
+	}
+	memdelete(body_def);
 }

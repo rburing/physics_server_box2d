@@ -12,9 +12,18 @@ config_version=5
 
 config/name="PhysicsServerBox2D demo"
 run/main_scene="res://world.tscn"
-config/features=PackedStringArray("4.0")
+config/features=PackedStringArray("4.1")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=720
+
+[editor_plugins]
+
+enabled=PackedStringArray()
 
 [physics]
 
-2d/physics_engine="Box2D"
+2d/physics_engine="GodotPhysics2D"

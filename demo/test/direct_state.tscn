@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://dj5cgf8kkk6gl"]
+
+[ext_resource type="Script" path="res://test/direct_state.gd" id="1_u32j0"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_krbkf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b4m2t"]
+size = Vector2(500, 20)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_pqs1d"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2xvw2"]
+
+[node name="direct_state" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(-0.22, -0.83)
+physics_material_override = SubResource("PhysicsMaterial_krbkf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_b4m2t")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("WorldBoundaryShape2D_pqs1d")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2(-155, -295)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+linear_damp = 1.06
+script = ExtResource("1_u32j0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_2xvw2")
+
+[node name="Camera2D" type="Camera2D" parent="RigidBody2D"]

@@ -58,7 +58,7 @@ int32 Box2DSpace::get_solver_iterations() const {
 }
 
 void Box2DSpace::step(float p_step) {
-	const int32 velocityIterations = solver_iterations + 2;
+	const int32 velocityIterations = solver_iterations;
 	const int32 positionIterations = solver_iterations;
 
 	const SelfList<Box2DBody>::List *body_list = &get_active_body_list();

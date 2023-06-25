@@ -24,7 +24,7 @@ class Box2DArea : public Box2DCollisionObject {
 	real_t gravity_point_unit_distance = 0;
 	PhysicsServer2D::AreaSpaceOverrideMode linear_damp_override_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
 	PhysicsServer2D::AreaSpaceOverrideMode angular_damp_override_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
-	Vector<Box2DBody *> bodies;
+	Vector<Box2DCollisionObject *> bodies;
 
 public:
 	virtual void set_linear_damp(real_t p_linear_damp) override;
@@ -52,8 +52,8 @@ public:
 	PhysicsServer2D::AreaSpaceOverrideMode get_linear_damp_override_mode() const;
 	PhysicsServer2D::AreaSpaceOverrideMode get_angular_damp_override_mode() const;
 
-	void add_body(Box2DBody *p_body);
-	void remove_body(Box2DBody *p_body);
+	void add_body(Box2DCollisionObject *p_body);
+	void remove_body(Box2DCollisionObject *p_body);
 
 	Box2DArea();
 	~Box2DArea();

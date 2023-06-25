@@ -1,40 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://bkd3jvy83di6t"]
+[gd_scene load_steps=6 format=3 uid="uid://bkd3jvy83di6t"]
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_565db"]
+[ext_resource type="Script" path="res://load_all.gd" id="1_rw7wb"]
+[ext_resource type="PackedScene" uid="uid://qkydtngukmpk" path="res://test/areas/default_area.tscn" id="2_hqgsh"]
+[ext_resource type="PackedScene" uid="uid://c7hwetrhwy0un" path="res://test/shapes/shapes.tscn" id="3_ijr2j"]
+[ext_resource type="PackedScene" uid="uid://c2qhd3ltp0vfh" path="res://test/stress/stress_circle.tscn" id="4_eu55f"]
+[ext_resource type="PackedScene" uid="uid://d0hx6ba75xde2" path="res://test/stress/stress_square.tscn" id="5_ci8on"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ruwi5"]
+[node name="World" type="Node2D" node_paths=PackedStringArray("label")]
+script = ExtResource("1_rw7wb")
+scenes = Array[PackedScene]([ExtResource("4_eu55f"), ExtResource("5_ci8on"), ExtResource("3_ijr2j"), ExtResource("2_hqgsh")])
+label = NodePath("Label")
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ojsky"]
+[node name="Camera2D" type="Camera2D" parent="."]
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_kpwdm"]
-a = Vector2(55.4879, -251.8)
-b = Vector2(-120.103, 520.293)
-
-[node name="World" type="Node2D"]
-
-[node name="RigidBody2D" type="RigidBody2D" parent="."]
-position = Vector2(-27, -222)
-collision_layer = 3
-mass = 3.0
-physics_material_override = SubResource("PhysicsMaterial_565db")
-
-[node name="Camera2D" type="Camera2D" parent="RigidBody2D"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
-shape = SubResource("RectangleShape2D_ruwi5")
-
-[node name="RigidBody2D2" type="RigidBody2D" parent="."]
-position = Vector2(59, -91)
-rotation = 2.4934
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
-shape = SubResource("RectangleShape2D_ruwi5")
-
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(6, -75)
-physics_material_override = SubResource("PhysicsMaterial_ojsky")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(3, -97)
-rotation = 1.12303
-shape = SubResource("SegmentShape2D_kpwdm")
+[node name="Label" type="Label" parent="."]
+offset_left = -263.0
+offset_top = -311.0
+offset_right = -223.0
+offset_bottom = -288.0

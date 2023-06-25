@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://do8b46ptnywnd"]
+
+[ext_resource type="Script" path="res://test/stress/generate.gd" id="1_xiuuu"]
+[ext_resource type="PackedScene" uid="uid://bh1oj182u2ook" path="res://test/stress/circle.tscn" id="2_k8qfv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_we2n6"]
+size = Vector2(554.5, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lmruo"]
+size = Vector2(27.5, 563)
+
+[node name="stress" type="Node2D" node_paths=PackedStringArray("label")]
+position = Vector2(0, -205)
+script = ExtResource("1_xiuuu")
+node = ExtResource("2_k8qfv")
+label = NodePath("Label")
+metadata/run_time = 15
+
+[node name="Title" type="Label" parent="."]
+offset_left = -154.0
+offset_top = -49.0
+offset_right = -57.0
+offset_bottom = -23.0
+text = "Stress Test"
+
+[node name="Label" type="Label" parent="."]
+offset_left = 190.0
+offset_top = -63.0
+offset_right = 230.0
+offset_bottom = -37.0
+text = "0"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(2, 199)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(2, 199)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-3.25, 335)
+shape = SubResource("RectangleShape2D_we2n6")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-266.25, 67.5)
+shape = SubResource("RectangleShape2D_lmruo")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(254, 66)
+shape = SubResource("RectangleShape2D_lmruo")

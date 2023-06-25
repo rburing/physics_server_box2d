@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2qhd3ltp0vfh"]
+
+[ext_resource type="PackedScene" uid="uid://do8b46ptnywnd" path="res://test/stress/stress.tscn" id="1_rkar6"]
+
+[node name="stress_cirlce" type="Node2D"]
+metadata/run_time = 15
+
+[node name="stress" parent="." instance=ExtResource("1_rkar6")]

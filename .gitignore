@@ -7,3 +7,8 @@ demo/.godot/
 
 # Generated directories with binaries
 demo/bin/
+
+.DS_Store
+.vscode
+demo/recording/Box2D.avi
+demo/recording/GodotPhysics2D.avi

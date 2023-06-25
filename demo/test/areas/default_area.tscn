@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3 uid="uid://qkydtngukmpk"]
+
+[ext_resource type="Script" path="res://test/areas/default_area_info.gd" id="1_q3swv"]
+[ext_resource type="Script" path="res://test/areas/show_default_area_info.gd" id="2_o2set"]
+[ext_resource type="Script" path="res://test/show_info_rb.gd" id="2_pc0g2"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_thkdu"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fgchw"]
+
+[node name="default_area" type="Node2D"]
+script = ExtResource("1_q3swv")
+metadata/run_time = 7
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(3, -98)
+rotation = -3.12864
+shape = SubResource("WorldBoundaryShape2D_thkdu")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1, 107)
+rotation = -0.00947069
+shape = SubResource("WorldBoundaryShape2D_thkdu")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+script = ExtResource("2_pc0g2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_fgchw")
+
+[node name="ShowDefaultArea" type="Node2D" parent="."]
+position = Vector2(-146, -88)
+script = ExtResource("2_o2set")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 62.0
+offset_top = -192.0
+offset_right = 317.0
+offset_bottom = -114.0
+text = "DefaultArea:
+Changes default area gravity and
+linear/angular dampw"
+
+[node name="Camera2D" type="Camera2D" parent="."]

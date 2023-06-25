@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://d0hx6ba75xde2"]
+
+[ext_resource type="PackedScene" uid="uid://do8b46ptnywnd" path="res://test/stress/stress.tscn" id="1_i521x"]
+[ext_resource type="PackedScene" uid="uid://bmy6sonnkt8so" path="res://test/stress/square.tscn" id="2_fgcgo"]
+
+[node name="stress_square" type="Node2D"]
+metadata/run_time = 15
+
+[node name="stress" parent="." instance=ExtResource("1_i521x")]
+node = ExtResource("2_fgcgo")
