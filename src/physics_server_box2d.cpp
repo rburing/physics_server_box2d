@@ -479,6 +479,7 @@ RID PhysicsServerBox2D::_body_create() {
 	RID rid = body_owner.make_rid(body);
 	body->set_self(rid);
 	body->add_area(&default_area);
+	default_area.add_body(body);
 	return rid;
 }
 
@@ -1189,6 +1190,9 @@ int PhysicsServerBox2D::_get_process_info(ProcessInfo process_info) {
 
 PhysicsServerBox2D::PhysicsServerBox2D() {
 	default_area.set_priority(-1);
+	default_area.set_gravity_override_mode(AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE);
+	default_area.set_linear_damp_override_mode(AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE);
+	default_area.set_angular_damp_override_mode(AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE);
 }
 
 PhysicsServerBox2D::~PhysicsServerBox2D() {

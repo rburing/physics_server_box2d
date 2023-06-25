@@ -2,6 +2,7 @@
 #define BOX2D_AREA_H
 
 #include <godot_cpp/classes/physics_server2d.hpp>
+#include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/callable.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
@@ -10,20 +11,25 @@
 
 using namespace godot;
 
+class Box2DBody;
 
 class Box2DArea : public Box2DCollisionObject {
 	bool monitorable = false;
 	Callable monitor_callback;
 	Callable area_monitor_callback;
 	PhysicsServer2D::AreaSpaceOverrideMode gravity_override_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
-	real_t gravity = 10;
-	b2Vec2 gravity_vector = b2Vec2(0, -1);
+	real_t gravity = 9.8;
+	b2Vec2 gravity_vector = b2Vec2(0, 1);
 	real_t gravity_is_point = false;
 	real_t gravity_point_unit_distance = 0;
-	PhysicsServer2D::AreaSpaceOverrideMode linear_damp_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
-	PhysicsServer2D::AreaSpaceOverrideMode angular_damp_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
+	PhysicsServer2D::AreaSpaceOverrideMode linear_damp_override_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
+	PhysicsServer2D::AreaSpaceOverrideMode angular_damp_override_mode = PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_DISABLED;
+	Vector<Box2DBody *> bodies;
 
 public:
+	virtual void set_linear_damp(real_t p_linear_damp) override;
+	virtual void set_angular_damp(real_t p_angular_damp) override;
+	virtual void set_priority(real_t p_priority) override;
 	// Physics Server
 	void set_monitorable(bool monitorable);
 	void set_monitor_callback(const Callable &callback);
@@ -45,6 +51,9 @@ public:
 	Vector2 get_gravity_vector() const;
 	PhysicsServer2D::AreaSpaceOverrideMode get_linear_damp_override_mode() const;
 	PhysicsServer2D::AreaSpaceOverrideMode get_angular_damp_override_mode() const;
+
+	void add_body(Box2DBody *p_body);
+	void remove_body(Box2DBody *p_body);
 
 	Box2DArea();
 	~Box2DArea();

@@ -63,17 +63,14 @@ protected:
 	real_t bounce = 0;
 	real_t linear_damp = 0;
 	real_t angular_damp = 0;
-	real_t total_linear_damp = 0;
-	real_t total_angular_damp = 0;
-	b2Vec2 total_gravity = b2Vec2_zero;
+	real_t total_linear_damp = 0.1;
+	real_t total_angular_damp = 1;
+	b2Vec2 total_gravity = b2Vec2(0, -9.8);
 	PhysicsServer2D::BodyDampMode linear_damp_mode = PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_COMBINE;
 	PhysicsServer2D::BodyDampMode angular_damp_mode = PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_COMBINE;
 
 	void _clear_fixtures();
 	void _update_shapes();
-	void _recalculate_total_gravity();
-	void _recalculate_total_linear_damp();
-	void _recalculate_total_angular_damp();
 	Box2DDirectSpaceState *direct_space = nullptr;
 
 	b2MassData mass_data;
@@ -94,10 +91,10 @@ protected:
 
 public:
 	void set_linear_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);
-	void set_linear_damp(real_t p_linear_damp);
+	virtual void set_linear_damp(real_t p_linear_damp);
 	void set_angular_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);
-	void set_angular_damp(real_t p_angular_damp);
-	void set_priority(real_t p_priority);
+	virtual void set_angular_damp(real_t p_angular_damp);
+	virtual void set_priority(real_t p_priority);
 	void set_bounce(real_t p_bounce);
 	void set_friction(real_t p_friction);
 	void set_mass(real_t p_mass);
@@ -188,6 +185,10 @@ public:
 	virtual void set_space(Box2DSpace *p_space) = 0;
 
 	// MISC
+	void recalculate_total_gravity();
+	void recalculate_total_linear_damp();
+	void recalculate_total_angular_damp();
+
 	Object *get_object() const;
 	Type get_type() const;
 	void set_self(const RID &p_self);

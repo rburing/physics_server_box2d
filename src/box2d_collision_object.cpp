@@ -29,11 +29,11 @@ void Box2DCollisionObject::set_angular_damp_mode(PhysicsServer2D::BodyDampMode p
 
 void Box2DCollisionObject::set_linear_damp(real_t p_linear_damp) {
 	godot_to_box2d(p_linear_damp, linear_damp);
-	_recalculate_total_linear_damp();
+	recalculate_total_linear_damp();
 }
 void Box2DCollisionObject::set_angular_damp(real_t p_angular_damp) {
 	godot_to_box2d(p_angular_damp, angular_damp);
-	_recalculate_total_angular_damp();
+	recalculate_total_angular_damp();
 }
 PhysicsServer2D::BodyDampMode Box2DCollisionObject::get_linear_damp_mode() const {
 	return linear_damp_mode;
@@ -634,42 +634,43 @@ RID Box2DCollisionObject::get_self() const { return self; }
 void Box2DCollisionObject::add_area(Box2DArea *p_area) {
 	areas.append(p_area);
 	areas.sort();
-	_recalculate_total_gravity();
-	_recalculate_total_linear_damp();
-	_recalculate_total_angular_damp();
+	recalculate_total_gravity();
+	recalculate_total_gravity();
+	recalculate_total_gravity();
 }
 
-void Box2DCollisionObject::_recalculate_total_gravity() {
+void Box2DCollisionObject::recalculate_total_gravity() {
 	total_gravity = b2Vec2_zero;
 	// compute gravity from other areas
 	bool keep_computing = true;
 	for (Box2DArea *area : areas) {
-		if (keep_computing) {
-			b2Vec2 area_gravity = area->get_b2_gravity();
+		if (!keep_computing) {
+			break;
+		}
+		b2Vec2 area_gravity = area->get_b2_gravity();
 
-			switch (area->get_gravity_override_mode()) {
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
-					total_gravity += area_gravity;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
-					total_gravity += area_gravity;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
-					total_gravity = area_gravity;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
-					total_gravity = area_gravity;
-				} break;
-				default: {
-				}
+		switch (area->get_gravity_override_mode()) {
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+				total_gravity += area_gravity;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+				total_gravity += area_gravity;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+				total_gravity = area_gravity;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+				total_gravity = area_gravity;
+			} break;
+			default: {
 			}
 		}
 	}
 }
 
-void Box2DCollisionObject::_recalculate_total_linear_damp() {
+void Box2DCollisionObject::recalculate_total_linear_damp() {
 	total_linear_damp = linear_damp;
 	if (get_linear_damp_mode() == PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_REPLACE) {
 		body_def->linearDamping = total_linear_damp;
@@ -681,25 +682,26 @@ void Box2DCollisionObject::_recalculate_total_linear_damp() {
 	}
 	bool keep_computing = true;
 	for (Box2DArea *area : areas) {
-		if (keep_computing) {
-			real_t linear_damp = area->linear_damp;
-			switch (area->get_linear_damp_override_mode()) {
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
-					total_linear_damp += linear_damp;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
-					total_linear_damp += linear_damp;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
-					total_linear_damp = linear_damp;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
-					total_linear_damp = linear_damp;
-				} break;
-				default: {
-				}
+		if (!keep_computing) {
+			break;
+		}
+		real_t linear_damp = area->linear_damp;
+		switch (area->get_linear_damp_override_mode()) {
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+				total_linear_damp += linear_damp;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+				total_linear_damp += linear_damp;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+				total_linear_damp = linear_damp;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+				total_linear_damp = linear_damp;
+			} break;
+			default: {
 			}
 		}
 	}
@@ -709,7 +711,7 @@ void Box2DCollisionObject::_recalculate_total_linear_damp() {
 	}
 }
 
-void Box2DCollisionObject::_recalculate_total_angular_damp() {
+void Box2DCollisionObject::recalculate_total_angular_damp() {
 	total_angular_damp = angular_damp;
 	if (get_angular_damp_mode() == PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_REPLACE) {
 		body_def->angularDamping = total_angular_damp;
@@ -722,25 +724,26 @@ void Box2DCollisionObject::_recalculate_total_angular_damp() {
 	// compute angular damp from areas
 	bool keep_computing = true;
 	for (Box2DArea *area : areas) {
-		if (keep_computing) {
-			real_t angular_damp = area->angular_damp;
-			switch (area->get_angular_damp_override_mode()) {
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
-					total_angular_damp += angular_damp;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
-					total_angular_damp += angular_damp;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
-					total_angular_damp = angular_damp;
-					keep_computing = false;
-				} break;
-				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
-					total_angular_damp = angular_damp;
-				} break;
-				default: {
-				}
+		if (!keep_computing) {
+			break;
+		}
+		real_t angular_damp = area->angular_damp;
+		switch (area->get_angular_damp_override_mode()) {
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+				total_angular_damp += angular_damp;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+				total_angular_damp += angular_damp;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+				total_angular_damp = angular_damp;
+				keep_computing = false;
+			} break;
+			case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+				total_angular_damp = angular_damp;
+			} break;
+			default: {
 			}
 		}
 	}
