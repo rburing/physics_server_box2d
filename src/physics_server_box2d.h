@@ -51,6 +51,7 @@ protected:
 	static void _bind_methods(){};
 
 public:
+	/* SHAPE API */
 	virtual RID _world_boundary_shape_create() override;
 	virtual RID _separation_ray_shape_create() override;
 	virtual RID _segment_shape_create() override;
@@ -65,6 +66,8 @@ public:
 	virtual Variant _shape_get_data(const RID &shape) const override;
 	virtual double _shape_get_custom_solver_bias(const RID &shape) const override;
 	virtual bool _shape_collide(const RID &shape_A, const Transform2D &xform_A, const Vector2 &motion_A, const RID &shape_B, const Transform2D &xform_B, const Vector2 &motion_B, void *results, int32_t result_max, int32_t *result_count) override;
+
+	/* SPACE API */
 	virtual RID _space_create() override;
 	virtual void _space_set_active(const RID &space, bool active) override;
 	virtual bool _space_is_active(const RID &space) const override;
@@ -74,6 +77,8 @@ public:
 	virtual void _space_set_debug_contacts(const RID &space, int32_t max_contacts) override;
 	virtual PackedVector2Array _space_get_contacts(const RID &space) const override;
 	virtual int32_t _space_get_contact_count(const RID &space) const override;
+
+	/* AREA API */
 	virtual RID _area_create() override;
 	virtual void _area_set_space(const RID &area, const RID &space) override;
 	virtual RID _area_get_space(const RID &area) const override;
@@ -102,6 +107,8 @@ public:
 	virtual void _area_set_pickable(const RID &area, bool pickable) override;
 	virtual void _area_set_monitor_callback(const RID &area, const Callable &callback) override;
 	virtual void _area_set_area_monitor_callback(const RID &area, const Callable &callback) override;
+
+	/* BODY API */
 	virtual RID _body_create() override;
 	virtual void _body_set_space(const RID &body, const RID &space) override;
 	virtual RID _body_get_space(const RID &body) const override;
@@ -163,6 +170,8 @@ public:
 	virtual void _body_set_pickable(const RID &body, bool pickable) override;
 	virtual PhysicsDirectBodyState2D *_body_get_direct_state(const RID &body) override;
 	virtual bool _body_test_motion(const RID &body, const Transform2D &from, const Vector2 &motion, double margin, bool collide_separation_ray, bool recovery_as_collision, PhysicsServer2DExtensionMotionResult *result) const override;
+
+	/* JOINT API */
 	virtual RID _joint_create() override;
 	virtual void _joint_clear(const RID &joint) override;
 	virtual void _joint_set_param(const RID &joint, PhysicsServer2D::JointParam param, double value) override;
@@ -170,7 +179,6 @@ public:
 	virtual void _joint_disable_collisions_between_bodies(const RID &joint, bool disable) override;
 	virtual bool _joint_is_disabled_collisions_between_bodies(const RID &joint) const override;
 	virtual void _joint_make_pin(const RID &joint, const Vector2 &anchor, const RID &body_a, const RID &body_b) override;
-
 	virtual void _joint_make_groove(const RID &joint, const Vector2 &a_groove1, const Vector2 &a_groove2, const Vector2 &b_anchor, const RID &body_a, const RID &body_b) override;
 	virtual void _joint_make_damped_spring(const RID &joint, const Vector2 &anchor_a, const Vector2 &anchor_b, const RID &body_a, const RID &body_b) override;
 	virtual void _pin_joint_set_param(const RID &joint, PhysicsServer2D::PinJointParam param, double value) override;
@@ -178,6 +186,8 @@ public:
 	virtual void _damped_spring_joint_set_param(const RID &joint, PhysicsServer2D::DampedSpringParam param, double value) override;
 	virtual double _damped_spring_joint_get_param(const RID &joint, PhysicsServer2D::DampedSpringParam param) const override;
 	virtual PhysicsServer2D::JointType _joint_get_type(const RID &joint) const override;
+
+	/* MISC API */
 	virtual void _free_rid(const RID &rid) override;
 	virtual void _set_active(bool active) override;
 	virtual void _init() override;
