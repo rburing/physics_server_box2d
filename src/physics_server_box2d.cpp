@@ -354,7 +354,7 @@ void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_para
 			area->set_gravity_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_GRAVITY: {
-			area->set_gravity(p_value);
+			area->set_gravity(godot_to_box2d(p_value));
 		} break;
 		case AREA_PARAM_GRAVITY_VECTOR: {
 			area->set_gravity_vector(p_value);
@@ -367,16 +367,16 @@ void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_para
 			area->set_linear_damp_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_LINEAR_DAMP: {
-			area->set_linear_damp(p_value);
+			area->set_linear_damp(godot_to_box2d(p_value));
 		} break;
 		case AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE: {
 			area->set_angular_damp_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_ANGULAR_DAMP: {
-			area->set_angular_damp(p_value);
+			area->set_angular_damp(godot_to_box2d(p_value));
 		} break;
 		case AREA_PARAM_PRIORITY: {
-			area->set_priority(p_value);
+			area->set_priority(godot_to_box2d(p_value));
 		} break;
 	}
 }
@@ -720,31 +720,31 @@ void PhysicsServerBox2D::_body_set_param(const RID &p_body, PhysicsServer2D::Bod
 	ERR_FAIL_COND(!body);
 	switch (p_param) {
 		case BODY_PARAM_BOUNCE: {
-			body->set_bounce(p_value);
+			body->set_bounce(godot_to_box2d(p_value));
 		}
 		case BODY_PARAM_FRICTION: {
-			body->set_friction(p_value);
+			body->set_friction(godot_to_box2d(p_value));
 		}
 		case BODY_PARAM_MASS: {
-			body->set_mass(p_value);
+			body->set_mass(godot_to_box2d(p_value));
 		} break;
 		case BODY_PARAM_INERTIA: {
-			body->set_inertia(p_value);
+			body->set_inertia(godot_to_box2d(p_value));
 		} break;
 		case BODY_PARAM_CENTER_OF_MASS: {
 			body->set_center_of_mass(p_value);
 		} break;
 		case BODY_PARAM_GRAVITY_SCALE: {
-			body->set_gravity_scale(p_value);
+			body->set_gravity_scale(godot_to_box2d(p_value));
 		} break;
 		case BODY_PARAM_LINEAR_DAMP: {
-			body->set_linear_damp(p_value);
+			body->set_linear_damp(godot_to_box2d(p_value));
 		} break;
 		case BODY_PARAM_LINEAR_DAMP_MODE: {
 			body->set_linear_damp_mode(static_cast<BodyDampMode>((int)p_value));
 		} break;
 		case BODY_PARAM_ANGULAR_DAMP: {
-			body->set_angular_damp(p_value);
+			body->set_angular_damp(godot_to_box2d(p_value));
 		} break;
 		case BODY_PARAM_ANGULAR_DAMP_MODE: {
 			body->set_angular_damp_mode(static_cast<BodyDampMode>((int)p_value));

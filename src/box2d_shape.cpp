@@ -11,8 +11,8 @@
 /* CIRCLE SHAPE */
 
 void Box2DShapeCircle::set_data(const Variant &p_data) {
-	ERR_FAIL_COND(p_data.get_type() != Variant::FLOAT);
-	radius = p_data;
+	ERR_FAIL_COND(p_data.get_type() != Variant::FLOAT && p_data.get_type() != Variant::INT);
+	radius = godot_to_box2d(p_data);
 	configured = true;
 }
 

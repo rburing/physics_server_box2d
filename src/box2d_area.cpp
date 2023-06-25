@@ -27,16 +27,6 @@ void Box2DArea::set_space(Box2DSpace *p_space) {
 
 	_set_space(p_space);
 }
-
-Box2DArea::Box2DArea() :
-		Box2DCollisionObject(TYPE_AREA) {
-	linear_damp = 0.1;
-	angular_damp = 1;
-	//_set_static(true); //areas are not active by default
-}
-
-Box2DArea::~Box2DArea() {
-}
 void Box2DArea::set_priority(real_t p_priority) {
 	priority = p_priority;
 	for (Box2DBody *body : bodies) {
@@ -52,7 +42,7 @@ void Box2DArea::set_gravity_override_mode(PhysicsServer2D::AreaSpaceOverrideMode
 		body->recalculate_total_gravity();
 	}
 }
-void Box2DArea::set_gravity(double p_value) {
+void Box2DArea::set_gravity(real_t p_value) {
 	gravity = p_value / 100.0f;
 	for (Box2DBody *body : bodies) {
 		body->recalculate_total_gravity();
@@ -113,4 +103,14 @@ void Box2DArea::add_body(Box2DBody *p_body) {
 }
 void Box2DArea::remove_body(Box2DBody *p_body) {
 	bodies.erase(p_body);
+}
+
+Box2DArea::Box2DArea() :
+		Box2DCollisionObject(TYPE_AREA) {
+	linear_damp = 0.1;
+	angular_damp = 1;
+	//_set_static(true); //areas are not active by default
+}
+
+Box2DArea::~Box2DArea() {
 }

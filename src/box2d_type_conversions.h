@@ -2,6 +2,7 @@
 #define BOX2D_TYPE_CONVERSIONS_H
 
 #include <godot_cpp/variant/vector2.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 #include <box2d/b2_math.h>
 
@@ -25,5 +26,7 @@ void box2d_to_godot(const b2Vec2 &p_box2d_vector, Vector2 &r_vector);
 float box2d_to_godot(const float &p_box2d_value);
 double box2d_to_godot_d(const float &p_box2d_value);
 Vector2 box2d_to_godot(const b2Vec2 &p_box2d_vector);
+
+float godot_to_box2d(Variant p_variant);
 
 #endif // BOX2D_TYPE_CONVERSIONS_H

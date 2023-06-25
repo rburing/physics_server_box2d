@@ -40,7 +40,7 @@ public:
 	virtual void set_space(Box2DSpace *p_space) override;
 
 	void set_gravity_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value);
-	void set_gravity(double p_value);
+	void set_gravity(real_t p_value);
 	void set_gravity_vector(Vector2 p_value);
 	void set_linear_damp_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value);
 	void set_angular_damp_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value);

@@ -28,11 +28,11 @@ void Box2DCollisionObject::set_angular_damp_mode(PhysicsServer2D::BodyDampMode p
 }
 
 void Box2DCollisionObject::set_linear_damp(real_t p_linear_damp) {
-	godot_to_box2d(p_linear_damp, linear_damp);
+	linear_damp = p_linear_damp;
 	recalculate_total_linear_damp();
 }
 void Box2DCollisionObject::set_angular_damp(real_t p_angular_damp) {
-	godot_to_box2d(p_angular_damp, angular_damp);
+	angular_damp = p_angular_damp;
 	recalculate_total_angular_damp();
 }
 PhysicsServer2D::BodyDampMode Box2DCollisionObject::get_linear_damp_mode() const {
@@ -42,10 +42,10 @@ PhysicsServer2D::BodyDampMode Box2DCollisionObject::get_angular_damp_mode() cons
 	return angular_damp_mode;
 }
 double Box2DCollisionObject::get_linear_damp() const {
-	return box2d_to_godot(body_def->linearDamping);
+	return linear_damp;
 }
 double Box2DCollisionObject::get_angular_damp() const {
-	return box2d_to_godot(body_def->angularDamping);
+	return angular_damp;
 }
 
 void Box2DCollisionObject::set_priority(real_t p_priority) {

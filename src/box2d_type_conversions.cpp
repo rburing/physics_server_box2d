@@ -47,3 +47,10 @@ double box2d_to_godot_d(const float &p_box2d_value) {
 Vector2 box2d_to_godot(const b2Vec2 &p_box2d_vector) {
 	return Vector2(B_TO_G_FACTOR * p_box2d_vector.x, B_TO_G_FACTOR * p_box2d_vector.y);
 }
+
+float godot_to_box2d(Variant p_variant) {
+	if (p_variant.get_type() == Variant::INT) {
+		return (int)p_variant;
+	}
+	return p_variant;
+}
