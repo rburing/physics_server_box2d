@@ -25,6 +25,9 @@ public:
 		TYPE_AREA,
 		TYPE_BODY
 	};
+	bool operator<(const Box2DCollisionObject &other) const {
+		return priority < other.priority;
+	}
 
 protected:
 	Type type;
@@ -35,7 +38,7 @@ protected:
 	b2Body *body = nullptr;
 	b2BodyDef *body_def = nullptr;
 	Box2DSpace *space = nullptr;
-	Box2DArea *area = nullptr;
+	Vector<Box2DArea *> areas;
 
 	struct Shape {
 		Transform2D xform;
@@ -45,7 +48,7 @@ protected:
 		bool one_way_collision = false;
 	};
 
-	double priority;
+	real_t priority = 1;
 	bool pickable = false;
 
 	uint32_t collision_layer = 1;
@@ -53,18 +56,28 @@ protected:
 
 	Vector<Shape> shapes;
 
-	b2Vec2 constant_force;
-	b2Vec2 constant_force_position;
-	double constant_torque = 0;
-	double friction = 1;
-	double bounce = 0;
+	b2Vec2 constant_force = b2Vec2_zero;
+	b2Vec2 constant_force_position = b2Vec2_zero;
+	real_t constant_torque = 0;
+	real_t friction = 1;
+	real_t bounce = 0;
+	real_t linear_damp = 0;
+	real_t angular_damp = 0;
+	real_t total_linear_damp = 0;
+	real_t total_angular_damp = 0;
+	b2Vec2 total_gravity = b2Vec2_zero;
+	PhysicsServer2D::BodyDampMode linear_damp_mode = PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_COMBINE;
+	PhysicsServer2D::BodyDampMode angular_damp_mode = PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_COMBINE;
 
 	void _clear_fixtures();
 	void _update_shapes();
+	void _recalculate_total_gravity();
+	void _recalculate_total_linear_damp();
+	void _recalculate_total_angular_damp();
 	Box2DDirectSpaceState *direct_space = nullptr;
 
 	b2MassData mass_data;
-
+	real_t gravity_scale = 1;
 	struct ContactEdgeData {
 		b2ContactEdge *edge;
 		int32_t point_idx;
@@ -80,16 +93,20 @@ protected:
 	Box2DCollisionObject(Type p_type);
 
 public:
-	void set_linear_damp(double p_linear_damp);
-	void set_angular_damp(double p_angular_damp);
-	void set_priority(double p_priority);
-	void set_bounce(double p_bounce);
-	void set_friction(double p_friction);
-	void set_mass(double p_mass);
-	void set_inertia(double p_inertia);
+	void set_linear_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);
+	void set_linear_damp(real_t p_linear_damp);
+	void set_angular_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);
+	void set_angular_damp(real_t p_angular_damp);
+	void set_priority(real_t p_priority);
+	void set_bounce(real_t p_bounce);
+	void set_friction(real_t p_friction);
+	void set_mass(real_t p_mass);
+	void set_inertia(real_t p_inertia);
 	void set_center_of_mass(Vector2 p_center_of_mass);
 
+	PhysicsServer2D::BodyDampMode get_linear_damp_mode() const;
 	double get_linear_damp() const;
+	PhysicsServer2D::BodyDampMode get_angular_damp_mode() const;
 	double get_angular_damp() const;
 	double get_priority() const;
 	double get_bounce() const;
@@ -165,6 +182,8 @@ public:
 	virtual const Transform2D &get_shape_transform(int p_index) const;
 	virtual void remove_shape(Box2DShape *p_shape);
 	virtual void remove_shape(int p_index);
+	void set_gravity_scale(real_t p_gravity_scale);
+	real_t get_gravity_scale();
 
 	virtual void set_space(Box2DSpace *p_space) = 0;
 
@@ -173,8 +192,8 @@ public:
 	Type get_type() const;
 	void set_self(const RID &p_self);
 	RID get_self() const;
-	virtual void set_area(Box2DArea *p_area);
-	virtual Box2DArea *get_area();
+	virtual void add_area(Box2DArea *p_area);
+	virtual void remove_area(Box2DArea *p_area);
 
 	b2BodyDef *get_b2BodyDef();
 	void set_b2BodyDef(b2BodyDef *p_body_def);

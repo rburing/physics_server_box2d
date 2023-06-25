@@ -18,15 +18,15 @@ class Box2DBody;
 class Box2DJoint {
 	RID self;
 	bool disable_collisions = false;
-	double pin_softness = 0;
-	double damped_spring_rest_length = 0;
-	double damped_spring_stiffness = 0;
-	double damped_spring_damping = 0;
-	float groove_lower_translation = 0;
-	float groove_upper_translation = 0;
-	double bias = 0;
-	double max_bias = 0;
-	double max_force = 0;
+	real_t pin_softness = 0;
+	real_t damped_spring_rest_length = 0;
+	real_t damped_spring_stiffness = 0;
+	real_t damped_spring_damping = 0;
+	real_t groove_lower_translation = 0;
+	real_t groove_upper_translation = 0;
+	real_t bias = 0;
+	real_t max_bias = 0;
+	real_t max_force = 0;
 	Box2DBody *body_a = nullptr;
 	Box2DBody *body_b = nullptr;
 
@@ -52,12 +52,12 @@ public:
 	_FORCE_INLINE_ bool is_configured() const { return configured; }
 	Box2DBody *get_body_a();
 	Box2DBody *get_body_b();
-	void set_bias(double p_data);
-	void set_max_bias(double p_data);
-	void set_max_force(double p_data);
-	double get_bias();
-	double get_max_bias();
-	double get_max_force();
+	void set_bias(real_t p_data);
+	void set_max_bias(real_t p_data);
+	void set_max_force(real_t p_data);
+	real_t get_bias();
+	real_t get_max_bias();
+	real_t get_max_force();
 	Variant get_data() const;
 	void clear();
 	void set_disable_collisions(bool disable_collisions);
@@ -65,14 +65,14 @@ public:
 	void make_pin(const Vector2 &p_anchor, Box2DBody *p_body_a, Box2DBody *p_body_b);
 	void make_groove(const Vector2 &p_a_groove1, const Vector2 &p_a_groove2, const Vector2 &p_b_anchor, Box2DBody *p_body_a, Box2DBody *p_body_b);
 	void make_damped_spring(const Vector2 &p_anchor_a, const Vector2 &p_anchor_b, Box2DBody *p_body_a, Box2DBody *p_body_b);
-	void set_pin_softness(double p_softness);
-	double get_pin_softness();
-	void set_damped_spring_rest_length(double p_damped_spring_rest_length);
-	double get_damped_spring_rest_length();
-	void set_damped_spring_stiffness(double p_damped_spring_stiffness);
-	double get_damped_spring_stiffness();
-	void set_damped_spring_damping(double p_damped_spring_damping);
-	double get_damped_spring_damping();
+	void set_pin_softness(real_t p_softness);
+	real_t get_pin_softness();
+	void set_damped_spring_rest_length(real_t p_damped_spring_rest_length);
+	real_t get_damped_spring_rest_length();
+	void set_damped_spring_stiffness(real_t p_damped_spring_stiffness);
+	real_t get_damped_spring_stiffness();
+	void set_damped_spring_damping(real_t p_damped_spring_damping);
+	real_t get_damped_spring_damping();
 
 	b2JointDef *get_b2JointDef();
 	void set_b2JointDef(b2JointDef *p_joint_def);

@@ -20,17 +20,26 @@ void Box2DCollisionObject::reset_mass_properties() {
 	}
 }
 
-void Box2DCollisionObject::set_linear_damp(double p_linear_damp) {
-	godot_to_box2d(p_linear_damp, body_def->linearDamping);
-	if (body) {
-		body->SetLinearDamping(body_def->linearDamping);
-	}
+void Box2DCollisionObject::set_linear_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp) {
+	linear_damp_mode = p_linear_damp;
 }
-void Box2DCollisionObject::set_angular_damp(double p_angular_damp) {
-	godot_to_box2d(p_angular_damp, body_def->angularDamping);
-	if (body) {
-		body->SetAngularDamping(body_def->angularDamping);
-	}
+void Box2DCollisionObject::set_angular_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp) {
+	angular_damp_mode = p_linear_damp;
+}
+
+void Box2DCollisionObject::set_linear_damp(real_t p_linear_damp) {
+	godot_to_box2d(p_linear_damp, linear_damp);
+	_recalculate_total_linear_damp();
+}
+void Box2DCollisionObject::set_angular_damp(real_t p_angular_damp) {
+	godot_to_box2d(p_angular_damp, angular_damp);
+	_recalculate_total_angular_damp();
+}
+PhysicsServer2D::BodyDampMode Box2DCollisionObject::get_linear_damp_mode() const {
+	return linear_damp_mode;
+}
+PhysicsServer2D::BodyDampMode Box2DCollisionObject::get_angular_damp_mode() const {
+	return angular_damp_mode;
 }
 double Box2DCollisionObject::get_linear_damp() const {
 	return box2d_to_godot(body_def->linearDamping);
@@ -39,7 +48,7 @@ double Box2DCollisionObject::get_angular_damp() const {
 	return box2d_to_godot(body_def->angularDamping);
 }
 
-void Box2DCollisionObject::set_priority(double p_priority) {
+void Box2DCollisionObject::set_priority(real_t p_priority) {
 	priority = p_priority;
 }
 
@@ -54,27 +63,27 @@ double Box2DCollisionObject::get_inertia() const {
 	return mass_data.I; // no need to convert
 }
 
-void Box2DCollisionObject::set_bounce(double p_bounce) {
+void Box2DCollisionObject::set_bounce(real_t p_bounce) {
 	bounce = p_bounce;
 	if (body) {
 		_clear_fixtures();
 		_update_shapes();
 	}
 }
-void Box2DCollisionObject::set_friction(double p_friction) {
+void Box2DCollisionObject::set_friction(real_t p_friction) {
 	friction = p_friction;
 	if (body) {
 		_clear_fixtures();
 		_update_shapes();
 	}
 }
-void Box2DCollisionObject::set_mass(double p_mass) {
+void Box2DCollisionObject::set_mass(real_t p_mass) {
 	mass_data.mass = p_mass;
 	if (body) {
 		body->SetMassData(&mass_data);
 	}
 }
-void Box2DCollisionObject::set_inertia(double p_inertia) {
+void Box2DCollisionObject::set_inertia(real_t p_inertia) {
 	mass_data.I = p_inertia;
 	if (body) {
 		body->SetMassData(&mass_data);
@@ -95,10 +104,7 @@ double Box2DCollisionObject::get_friction() const {
 }
 
 Vector2 Box2DCollisionObject::get_total_gravity() const {
-	if (area->get_gravity_override_mode() == 0) {
-		return Vector2(0.0f, 9.8f);
-	}
-	return area->get_gravity() * area->get_gravity_vector();
+	return Vector2(total_gravity.x, total_gravity.y);
 }
 
 double Box2DCollisionObject::get_total_linear_damp() const {
@@ -546,6 +552,14 @@ const Transform2D &Box2DCollisionObject::get_shape_transform(int p_index) const 
 	CRASH_BAD_INDEX(p_index, shapes.size());
 	return shapes[p_index].xform;
 }
+
+void Box2DCollisionObject::set_gravity_scale(real_t p_gravity_scale) {
+	gravity_scale = p_gravity_scale; // no need to convert
+}
+
+real_t Box2DCollisionObject::get_gravity_scale() {
+	return gravity_scale; // no need to convert
+}
 // MISC
 
 void Box2DCollisionObject::_update_shapes() {
@@ -586,17 +600,15 @@ void Box2DCollisionObject::_update_shapes() {
 }
 void Box2DCollisionObject::before_step() {
 	if (body) {
-		if (area->get_gravity_override_mode() != 0) {
-			// custom gravity
-			body->ApplyForceToCenter(body->GetMass() * area->get_b2_gravity(), true);
-		}
+		// custom gravity
+		body->ApplyForceToCenter(body->GetMass() * gravity_scale * total_gravity, false);
 		if (constant_force != b2Vec2_zero) {
 			// constant force
-			body->ApplyForce(constant_force, constant_force_position, true);
+			body->ApplyForce(constant_force, constant_force_position, false);
 		}
 		if (constant_torque != 0) {
 			// constant torque
-			body->ApplyTorque(constant_torque, true);
+			body->ApplyTorque(constant_torque, false);
 		}
 	}
 }
@@ -619,11 +631,128 @@ Box2DCollisionObject::Type Box2DCollisionObject::get_type() const { return type;
 void Box2DCollisionObject::set_self(const RID &p_self) { self = p_self; }
 RID Box2DCollisionObject::get_self() const { return self; }
 
-void Box2DCollisionObject::set_area(Box2DArea *p_area) {
-	area = p_area;
+void Box2DCollisionObject::add_area(Box2DArea *p_area) {
+	areas.append(p_area);
+	areas.sort();
+	_recalculate_total_gravity();
+	_recalculate_total_linear_damp();
+	_recalculate_total_angular_damp();
 }
-Box2DArea *Box2DCollisionObject::get_area() {
-	return area;
+
+void Box2DCollisionObject::_recalculate_total_gravity() {
+	total_gravity = b2Vec2_zero;
+	// compute gravity from other areas
+	bool keep_computing = true;
+	for (Box2DArea *area : areas) {
+		if (keep_computing) {
+			b2Vec2 area_gravity = area->get_b2_gravity();
+
+			switch (area->get_gravity_override_mode()) {
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+					total_gravity += area_gravity;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+					total_gravity += area_gravity;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+					total_gravity = area_gravity;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+					total_gravity = area_gravity;
+				} break;
+				default: {
+				}
+			}
+		}
+	}
+}
+
+void Box2DCollisionObject::_recalculate_total_linear_damp() {
+	total_linear_damp = linear_damp;
+	if (get_linear_damp_mode() == PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_REPLACE) {
+		body_def->linearDamping = total_linear_damp;
+		if (body) {
+			body->SetLinearDamping(body_def->linearDamping);
+		}
+		// replace linear damp with body one
+		return;
+	}
+	bool keep_computing = true;
+	for (Box2DArea *area : areas) {
+		if (keep_computing) {
+			real_t linear_damp = area->linear_damp;
+			switch (area->get_linear_damp_override_mode()) {
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+					total_linear_damp += linear_damp;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+					total_linear_damp += linear_damp;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+					total_linear_damp = linear_damp;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+					total_linear_damp = linear_damp;
+				} break;
+				default: {
+				}
+			}
+		}
+	}
+	body_def->linearDamping = total_linear_damp;
+	if (body) {
+		body->SetLinearDamping(body_def->linearDamping);
+	}
+}
+
+void Box2DCollisionObject::_recalculate_total_angular_damp() {
+	total_angular_damp = angular_damp;
+	if (get_angular_damp_mode() == PhysicsServer2D::BodyDampMode::BODY_DAMP_MODE_REPLACE) {
+		body_def->angularDamping = total_angular_damp;
+		if (body) {
+			body->SetAngularDamping(body_def->angularDamping);
+		}
+		// replace angular damp with body one
+		return;
+	}
+	// compute angular damp from areas
+	bool keep_computing = true;
+	for (Box2DArea *area : areas) {
+		if (keep_computing) {
+			real_t angular_damp = area->angular_damp;
+			switch (area->get_angular_damp_override_mode()) {
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE: {
+					total_angular_damp += angular_damp;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_COMBINE_REPLACE: {
+					total_angular_damp += angular_damp;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE: {
+					total_angular_damp = angular_damp;
+					keep_computing = false;
+				} break;
+				case PhysicsServer2D::AreaSpaceOverrideMode::AREA_SPACE_OVERRIDE_REPLACE_COMBINE: {
+					total_angular_damp = angular_damp;
+				} break;
+				default: {
+				}
+			}
+		}
+	}
+	body_def->angularDamping = total_angular_damp;
+	if (body) {
+		body->SetAngularDamping(body_def->angularDamping);
+	}
+}
+
+void Box2DCollisionObject::remove_area(Box2DArea *p_area) {
+	areas.erase(p_area);
+	areas.sort();
 }
 
 b2BodyDef *Box2DCollisionObject::get_b2BodyDef() { return body_def; }

@@ -3,6 +3,7 @@
 
 #include <godot_cpp/core/memory.hpp>
 
+#include <box2d/b2_chain_shape.h>
 #include <box2d/b2_circle_shape.h>
 #include <box2d/b2_edge_shape.h>
 #include <box2d/b2_polygon_shape.h>
@@ -43,10 +44,14 @@ Variant Box2DShapeRectangle::get_data() const {
 b2Shape *Box2DShapeRectangle::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
 	b2PolygonShape *shape = memnew(b2PolygonShape);
-	half_extents *= p_transform.get_scale();
 	b2Vec2 box2d_half_extents = godot_to_box2d(half_extents);
-	b2Vec2 box2d_origin = godot_to_box2d(p_transform.get_origin());
-	shape->SetAsBox(box2d_half_extents.x, box2d_half_extents.y, box2d_origin, p_transform.get_rotation());
+	b2Vec2 *box2d_points = new b2Vec2[4];
+	godot_to_box2d(p_transform.xform(Vector2(-half_extents.x, -half_extents.y)), box2d_points[0]);
+	godot_to_box2d(p_transform.xform(Vector2(-half_extents.x, half_extents.y)), box2d_points[1]);
+	godot_to_box2d(p_transform.xform(Vector2(half_extents.x, half_extents.y)), box2d_points[2]);
+	godot_to_box2d(p_transform.xform(Vector2(half_extents.x, -half_extents.y)), box2d_points[3]);
+	shape->Set(box2d_points, 4);
+	delete[] box2d_points;
 	return shape;
 }
 
@@ -118,6 +123,17 @@ Variant Box2DShapeConvexPolygon::get_data() const {
 
 b2Shape *Box2DShapeConvexPolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
 	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
+	if (points.size() >= b2_maxPolygonVertices) {
+		// create a chain loop
+		b2ChainShape *shape = memnew(b2ChainShape);
+		b2Vec2 *box2d_points = new b2Vec2[points.size()];
+		for (int i = 0; i < points.size(); i++) {
+			godot_to_box2d(p_transform.xform(points[i]), box2d_points[i]);
+		}
+		shape->CreateLoop(box2d_points, (int)points.size());
+		delete[] box2d_points;
+		return shape;
+	}
 	b2PolygonShape *shape = memnew(b2PolygonShape);
 	b2Vec2 *box2d_points = new b2Vec2[points.size()];
 	for (int i = 0; i < points.size(); i++) {
@@ -149,22 +165,15 @@ Variant Box2DShapeConcavePolygon::get_data() const {
 	return points_array;
 }
 
-int Box2DShapeConcavePolygon::get_b2Shape_count() {
-	return points.size() / 2;
-}
-
 b2Shape *Box2DShapeConcavePolygon::get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) {
-	ERR_FAIL_INDEX_V(p_index, points.size() / 2, nullptr);
-	b2EdgeShape *shape = memnew(b2EdgeShape);
-	b2Vec2 edge_endpoints[2];
-	godot_to_box2d(p_transform.xform(points[2 * p_index]), edge_endpoints[0]);
-	godot_to_box2d(p_transform.xform(points[2 * p_index + 1]), edge_endpoints[1]);
-	if (one_way) {
-		b2Vec2 dirV0 = edge_endpoints[0] - edge_endpoints[1];
-		shape->SetOneSided(edge_endpoints[1] + dirV0, edge_endpoints[0], edge_endpoints[1], edge_endpoints[0] - dirV0);
-	} else {
-		shape->SetTwoSided(edge_endpoints[0], edge_endpoints[1]);
+	ERR_FAIL_INDEX_V(p_index, 1, nullptr);
+	b2ChainShape *shape = memnew(b2ChainShape);
+	b2Vec2 *box2d_points = new b2Vec2[points.size()];
+	for (int i = 0; i < points.size(); i++) {
+		godot_to_box2d(p_transform.xform(points[i]), box2d_points[i]);
 	}
+	shape->CreateChain(box2d_points, (int)points.size(), box2d_points[points.size() - 1], box2d_points[0]);
+	delete[] box2d_points;
 	return shape;
 }
 

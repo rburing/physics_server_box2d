@@ -27,22 +27,22 @@ void Box2DJoint::_recreate_joint() {
 	}
 }
 
-void Box2DJoint::set_bias(double p_data) {
+void Box2DJoint::set_bias(real_t p_data) {
 	bias = p_data;
 }
-void Box2DJoint::set_max_bias(double p_data) {
+void Box2DJoint::set_max_bias(real_t p_data) {
 	max_bias = p_data;
 }
-void Box2DJoint::set_max_force(double p_data) {
+void Box2DJoint::set_max_force(real_t p_data) {
 	max_force = p_data;
 }
-double Box2DJoint::get_bias() {
+real_t Box2DJoint::get_bias() {
 	return bias;
 }
-double Box2DJoint::get_max_bias() {
+real_t Box2DJoint::get_max_bias() {
 	return max_bias;
 }
-double Box2DJoint::get_max_force() {
+real_t Box2DJoint::get_max_force() {
 	return max_force;
 }
 
@@ -98,36 +98,36 @@ void Box2DJoint::make_damped_spring(const Vector2 &p_anchor_a, const Vector2 &p_
 	configured = true;
 }
 
-void Box2DJoint::set_pin_softness(double p_softness) {
+void Box2DJoint::set_pin_softness(real_t p_softness) {
 	pin_softness = p_softness;
 	_recreate_joint();
 }
 
-double Box2DJoint::get_pin_softness() {
+real_t Box2DJoint::get_pin_softness() {
 	return pin_softness;
 }
 
-void Box2DJoint::set_damped_spring_rest_length(double p_damped_spring_rest_length) {
+void Box2DJoint::set_damped_spring_rest_length(real_t p_damped_spring_rest_length) {
 	damped_spring_rest_length = godot_to_box2d(p_damped_spring_rest_length);
 	_recreate_joint();
 }
-double Box2DJoint::get_damped_spring_rest_length() {
+real_t Box2DJoint::get_damped_spring_rest_length() {
 	return box2d_to_godot(damped_spring_rest_length);
 }
 
-void Box2DJoint::set_damped_spring_stiffness(double p_damped_spring_stiffness) {
+void Box2DJoint::set_damped_spring_stiffness(real_t p_damped_spring_stiffness) {
 	damped_spring_stiffness = p_damped_spring_stiffness;
 	_recreate_joint();
 }
-double Box2DJoint::get_damped_spring_stiffness() {
+real_t Box2DJoint::get_damped_spring_stiffness() {
 	return damped_spring_stiffness;
 }
 
-void Box2DJoint::set_damped_spring_damping(double p_damped_spring_damping) {
+void Box2DJoint::set_damped_spring_damping(real_t p_damped_spring_damping) {
 	damped_spring_damping = p_damped_spring_damping;
 	_recreate_joint();
 }
-double Box2DJoint::get_damped_spring_damping() {
+real_t Box2DJoint::get_damped_spring_damping() {
 	return damped_spring_damping;
 }
 

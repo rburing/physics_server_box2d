@@ -96,7 +96,7 @@ class Box2DShapeConcavePolygon : public Box2DShape {
 public:
 	virtual void set_data(const Variant &p_data) override;
 	virtual Variant get_data() const override;
-	virtual int get_b2Shape_count() override;
+	virtual int get_b2Shape_count() override { return 1; }
 	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way) override;
 
 	Box2DShapeConcavePolygon() { type = PhysicsServer2D::SHAPE_CONCAVE_POLYGON; }
@@ -119,7 +119,7 @@ public:
 
 class Box2DShapeWorldBoundary : public Box2DShape {
 	Vector2 normal;
-	float distance;
+	real_t distance;
 
 public:
 	virtual void set_data(const Variant &p_data) override;

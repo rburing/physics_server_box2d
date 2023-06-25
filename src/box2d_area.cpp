@@ -29,13 +29,15 @@ void Box2DArea::set_space(Box2DSpace *p_space) {
 
 Box2DArea::Box2DArea() :
 		Box2DCollisionObject(TYPE_AREA) {
+	linear_damp = 0.1;
+	angular_damp = 1;
 	//_set_static(true); //areas are not active by default
 }
 
 Box2DArea::~Box2DArea() {
 }
 
-void Box2DArea::set_gravity_override_mode(int32_t p_value) {
+void Box2DArea::set_gravity_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value) {
 	gravity_override_mode = p_value;
 }
 void Box2DArea::set_gravity(double p_value) {
@@ -44,14 +46,14 @@ void Box2DArea::set_gravity(double p_value) {
 void Box2DArea::set_gravity_vector(Vector2 p_value) {
 	gravity_vector = b2Vec2(p_value.x, p_value.y);
 }
-void Box2DArea::set_linear_damp_override_mode(int32_t p_value) {
+void Box2DArea::set_linear_damp_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value) {
 	linear_damp_mode = p_value;
 }
-void Box2DArea::set_angular_damp_override_mode(int32_t p_value) {
+void Box2DArea::set_angular_damp_override_mode(PhysicsServer2D::AreaSpaceOverrideMode p_value) {
 	angular_damp_mode = p_value;
 }
 
-int32_t Box2DArea::get_gravity_override_mode() const {
+PhysicsServer2D::AreaSpaceOverrideMode Box2DArea::get_gravity_override_mode() const {
 	return gravity_override_mode;
 }
 double Box2DArea::get_gravity() const {
@@ -63,9 +65,9 @@ b2Vec2 Box2DArea::get_b2_gravity() const {
 Vector2 Box2DArea::get_gravity_vector() const {
 	return Vector2(gravity_vector.x, gravity_vector.y);
 }
-int32_t Box2DArea::get_linear_damp_override_mode() const {
+PhysicsServer2D::AreaSpaceOverrideMode Box2DArea::get_linear_damp_override_mode() const {
 	return linear_damp_mode;
 }
-int32_t Box2DArea::get_angular_damp_override_mode() const {
+PhysicsServer2D::AreaSpaceOverrideMode Box2DArea::get_angular_damp_override_mode() const {
 	return angular_damp_mode;
 }

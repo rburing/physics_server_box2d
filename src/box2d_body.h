@@ -32,17 +32,13 @@ class Box2DBody : public Box2DCollisionObject {
 
 	Box2DDirectBodyState *direct_state = nullptr;
 	HashSet<Box2DJoint *> joints;
-	int32 max_contacts_reported;
-
-	double gravity_scale;
+	int32 max_contacts_reported = 0;
 
 public:
 	// Physics Server
 	void set_max_contacts_reported(int32 p_max_contacts_reported);
-	void set_gravity_scale(double p_gravity_scale);
 
 	int32 get_max_contacts_reported();
-	double get_gravity_scale();
 
 	void set_space(Box2DSpace *p_space) override;
 

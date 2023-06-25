@@ -14,17 +14,6 @@ int32 Box2DBody::get_max_contacts_reported() {
 	return max_contacts_reported;
 }
 
-void Box2DBody::set_gravity_scale(double p_gravity_scale) {
-	body_def->gravityScale = p_gravity_scale; // no need to convert
-	if (body) {
-		body->SetGravityScale(body_def->gravityScale);
-	}
-}
-
-double Box2DBody::get_gravity_scale() {
-	return body_def->gravityScale; // no need to convert
-}
-
 void Box2DBody::wakeup() {
 	if ((!get_space()) || mode == PhysicsServer2D::BODY_MODE_STATIC || mode == PhysicsServer2D::BODY_MODE_KINEMATIC) {
 		return;

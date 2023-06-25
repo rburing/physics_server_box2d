@@ -351,7 +351,7 @@ void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_para
 	}
 	switch (p_param) {
 		case AREA_PARAM_GRAVITY_OVERRIDE_MODE: {
-			area->set_gravity_override_mode(p_value);
+			area->set_gravity_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_GRAVITY: {
 			area->set_gravity(p_value);
@@ -364,13 +364,13 @@ void PhysicsServerBox2D::_area_set_param(const RID &p_area, AreaParameter p_para
 		case AREA_PARAM_GRAVITY_POINT_UNIT_DISTANCE: {
 		} break;
 		case AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE: {
-			area->set_linear_damp_override_mode(p_value);
+			area->set_linear_damp_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_LINEAR_DAMP: {
 			area->set_linear_damp(p_value);
 		} break;
 		case AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE: {
-			area->set_angular_damp_override_mode(p_value);
+			area->set_angular_damp_override_mode(static_cast<AreaSpaceOverrideMode>((int)p_value));
 		} break;
 		case AREA_PARAM_ANGULAR_DAMP: {
 			area->set_angular_damp(p_value);
@@ -478,7 +478,7 @@ RID PhysicsServerBox2D::_body_create() {
 	Box2DBody *body = memnew(Box2DBody);
 	RID rid = body_owner.make_rid(body);
 	body->set_self(rid);
-	body->set_area(&default_area);
+	body->add_area(&default_area);
 	return rid;
 }
 
@@ -739,8 +739,14 @@ void PhysicsServerBox2D::_body_set_param(const RID &p_body, PhysicsServer2D::Bod
 		case BODY_PARAM_LINEAR_DAMP: {
 			body->set_linear_damp(p_value);
 		} break;
+		case BODY_PARAM_LINEAR_DAMP_MODE: {
+			body->set_linear_damp_mode(static_cast<BodyDampMode>((int)p_value));
+		} break;
 		case BODY_PARAM_ANGULAR_DAMP: {
 			body->set_angular_damp(p_value);
+		} break;
+		case BODY_PARAM_ANGULAR_DAMP_MODE: {
+			body->set_angular_damp_mode(static_cast<BodyDampMode>((int)p_value));
 		} break;
 		default: {
 		}
@@ -768,8 +774,14 @@ Variant PhysicsServerBox2D::_body_get_param(const RID &p_body, PhysicsServer2D::
 		case BODY_PARAM_GRAVITY_SCALE: {
 			return body->get_gravity_scale();
 		}
+		case BODY_PARAM_LINEAR_DAMP_MODE: {
+			return body->get_linear_damp_mode();
+		}
 		case BODY_PARAM_LINEAR_DAMP: {
 			return body->get_linear_damp();
+		}
+		case BODY_PARAM_ANGULAR_DAMP_MODE: {
+			return body->get_angular_damp_mode();
 		}
 		case BODY_PARAM_ANGULAR_DAMP: {
 			return body->get_angular_damp();
@@ -1176,6 +1188,7 @@ int PhysicsServerBox2D::_get_process_info(ProcessInfo process_info) {
 }
 
 PhysicsServerBox2D::PhysicsServerBox2D() {
+	default_area.set_priority(-1);
 }
 
 PhysicsServerBox2D::~PhysicsServerBox2D() {

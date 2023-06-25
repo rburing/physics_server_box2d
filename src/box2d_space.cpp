@@ -86,7 +86,7 @@ void Box2DSpace::step(float p_step) {
 		b->self()->before_step();
 		b = b->next();
 	}
-
+	world->SetAutoClearForces(true);
 	world->Step(p_step, velocityIterations, positionIterations);
 
 	body_list = &get_active_body_list();
@@ -116,8 +116,7 @@ Box2DDirectSpaceState *Box2DSpace::get_direct_state() {
 }
 
 Box2DSpace::Box2DSpace() {
-	b2Vec2 gravity(0.0f, 9.8f);
-	world = memnew(b2World(gravity));
+	world = memnew(b2World(b2Vec2_zero)); // gravity comes from areas
 }
 
 Box2DSpace::~Box2DSpace() {
