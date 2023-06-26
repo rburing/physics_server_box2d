@@ -288,7 +288,8 @@ Vector2 Box2DCollisionObject::get_contact_local_normal(int32_t contact_idx) cons
 	if (!data.edge) {
 		return Vector2();
 	}
-	return box2d_to_godot(data.edge->contact->GetManifold()->localNormal);
+	b2Vec2 normal = data.edge->contact->GetManifold()->localNormal;
+	return Vector2(normal.x, normal.y);
 }
 int32_t Box2DCollisionObject::get_contact_local_shape(int32_t contact_idx) const {
 	ContactEdgeData data = _get_contact_edge_data(contact_idx);
@@ -306,11 +307,7 @@ RID Box2DCollisionObject::get_contact_collider(int32_t contact_idx) const {
 	return user_data->collision_object->get_self();
 }
 Vector2 Box2DCollisionObject::get_contact_collider_position(int32_t contact_idx) const {
-	ContactEdgeData data = _get_contact_edge_data(contact_idx);
-	if (!data.edge) {
-		return Vector2();
-	}
-	return box2d_to_godot(data.edge->other->GetPosition());
+	return get_contact_local_position(contact_idx);
 }
 uint64_t Box2DCollisionObject::get_contact_collider_id(int32_t contact_idx) const {
 	ContactEdgeData data = _get_contact_edge_data(contact_idx);
@@ -426,6 +423,7 @@ void Box2DCollisionObject::add_shape(Box2DShape *p_shape, const Transform2D &p_t
 	s.xform = p_transform;
 	s.disabled = p_disabled;
 	shapes.push_back(s);
+	p_shape->set_body(this);
 
 	// TODO (queue) update
 }
@@ -434,6 +432,7 @@ void Box2DCollisionObject::set_shape(int p_index, Box2DShape *p_shape) {
 	ERR_FAIL_INDEX(p_index, shapes.size());
 	//shapes[p_index].shape->remove_owner(this);
 	shapes.write[p_index].shape = p_shape;
+	p_shape->set_body(this);
 
 	// TODO: (queue) update
 }
@@ -492,6 +491,12 @@ void Box2DCollisionObject::remove_shape(Box2DShape *p_shape) {
 			i--;
 		}
 	}
+	p_shape->remove_body(this);
+}
+
+void Box2DCollisionObject::recreate_shape(int p_index) {
+	_clear_fixtures();
+	_update_shapes();
 }
 
 void Box2DCollisionObject::remove_shape(int p_index) {
@@ -606,7 +611,7 @@ void Box2DCollisionObject::before_step() {
 		body->ApplyForceToCenter(body->GetMass() * gravity_scale * total_gravity, false);
 		if (constant_force != b2Vec2_zero) {
 			// constant force
-			body->ApplyForce(constant_force, constant_force_position, false);
+			body->ApplyForce(constant_force, constant_force_position + body->GetPosition(), false);
 		}
 		if (constant_torque != 0) {
 			// constant torque
@@ -786,6 +791,11 @@ Box2DCollisionObject::~Box2DCollisionObject() {
 	for (Box2DArea *area : areas) {
 		if (area) {
 			area->remove_body(this);
+		}
+	}
+	for (Shape shape : shapes) {
+		if (shape.shape) {
+			shape.shape->remove_body(this);
 		}
 	}
 	memdelete(body_def);

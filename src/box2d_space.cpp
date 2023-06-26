@@ -74,7 +74,9 @@ void Box2DSpace::step(float p_step) {
 	b = body_list->first();
 	active_body_count = 0;
 	while (b) {
-		active_body_count++;
+		if (!b->self()->is_sleeping()) {
+			active_body_count++;
+		}
 		b->self()->after_step();
 		b = b->next();
 	}

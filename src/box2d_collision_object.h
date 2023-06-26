@@ -90,6 +90,7 @@ protected:
 	Box2DCollisionObject(Type p_type);
 
 public:
+	void recreate_shape(int p_index);
 	void set_linear_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);
 	virtual void set_linear_damp(real_t p_linear_damp);
 	void set_angular_damp_mode(PhysicsServer2D::BodyDampMode p_linear_damp);

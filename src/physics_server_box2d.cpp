@@ -86,6 +86,7 @@ void PhysicsServerBox2D::_shape_set_data(const RID &p_shape, const Variant &p_da
 	Box2DShape *shape = shape_owner.get_or_null(p_shape);
 	ERR_FAIL_COND(!shape);
 	shape->set_data(p_data);
+	shape->recreate_shape();
 }
 
 void PhysicsServerBox2D::_shape_set_custom_solver_bias(const RID &shape, double bias) {

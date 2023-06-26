@@ -1,4 +1,5 @@
 #include "box2d_shape.h"
+#include "box2d_collision_object.h"
 #include "box2d_type_conversions.h"
 
 #include <godot_cpp/core/memory.hpp>
@@ -8,11 +9,22 @@
 #include <box2d/b2_edge_shape.h>
 #include <box2d/b2_polygon_shape.h>
 
+#define SHAPE_SMALLEST_VALUE 0.01
+
+void Box2DShape::recreate_shape() {
+	if (body) {
+		body->recreate_shape(0);
+	}
+}
+
 /* CIRCLE SHAPE */
 
 void Box2DShapeCircle::set_data(const Variant &p_data) {
 	ERR_FAIL_COND(p_data.get_type() != Variant::FLOAT && p_data.get_type() != Variant::INT);
 	radius = godot_to_box2d(p_data);
+	if (radius < SHAPE_SMALLEST_VALUE) {
+		radius = SHAPE_SMALLEST_VALUE;
+	}
 	configured = true;
 }
 
@@ -34,6 +46,12 @@ b2Shape *Box2DShapeCircle::get_transformed_b2Shape(int p_index, const Transform2
 void Box2DShapeRectangle::set_data(const Variant &p_data) {
 	ERR_FAIL_COND(p_data.get_type() != Variant::VECTOR2);
 	half_extents = p_data;
+	if (half_extents.x < SHAPE_SMALLEST_VALUE) {
+		half_extents.x = SHAPE_SMALLEST_VALUE;
+	}
+	if (half_extents.y < SHAPE_SMALLEST_VALUE) {
+		half_extents.y = SHAPE_SMALLEST_VALUE;
+	}
 	configured = true;
 }
 
@@ -68,6 +86,15 @@ void Box2DShapeCapsule::set_data(const Variant &p_data) {
 		Point2 p = p_data;
 		radius = p.x;
 		height = p.y;
+	}
+	if (radius < SHAPE_SMALLEST_VALUE) {
+		radius = SHAPE_SMALLEST_VALUE;
+	}
+	if (height < SHAPE_SMALLEST_VALUE) {
+		height = SHAPE_SMALLEST_VALUE;
+	}
+	if (radius > height * 0.5 - SHAPE_SMALLEST_VALUE) {
+		radius = height * 0.5 - SHAPE_SMALLEST_VALUE;
 	}
 	configured = true;
 }

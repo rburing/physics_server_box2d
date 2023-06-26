@@ -77,6 +77,9 @@ void Box2DBody::set_mode(PhysicsServer2D::BodyMode p_mode) {
 			set_active(true);
 		} break;
 	}
+	if (body) {
+		body->SetType(body_def->type);
+	}
 }
 
 PhysicsServer2D::BodyMode Box2DBody::get_mode() const {

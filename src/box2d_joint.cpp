@@ -48,7 +48,7 @@ real_t Box2DJoint::get_max_force() {
 
 void Box2DJoint::set_disable_collisions(bool p_disable_collisions) {
 	disable_collisions = p_disable_collisions;
-	joint_def->collideConnected = disable_collisions;
+	joint_def->collideConnected = !disable_collisions;
 	_recreate_joint();
 }
 
@@ -71,8 +71,10 @@ void Box2DJoint::make_pin(const Vector2 &p_anchor, Box2DBody *p_body_a, Box2DBod
 
 void Box2DJoint::make_groove(const Vector2 &p_a_groove1, const Vector2 &p_a_groove2, const Vector2 &p_b_anchor, Box2DBody *p_body_a, Box2DBody *p_body_b) {
 	type = PhysicsServer2D::JointType::JOINT_TYPE_GROOVE;
-	groove_lower_translation = godot_to_box2d((p_b_anchor - p_a_groove1).length());
-	groove_upper_translation = godot_to_box2d((p_b_anchor - p_a_groove2).length());
+	groove_lower_translation = godot_to_box2d((p_a_groove2 - p_b_anchor).length());
+	groove_upper_translation = godot_to_box2d((p_a_groove1 - p_b_anchor).length());
+	Vector2 axis = (p_a_groove1 - p_a_groove2).normalized();
+	groove_axis = b2Vec2(axis.x, axis.y);
 	anchor_b = godot_to_box2d(p_b_anchor);
 	b2PrismaticJointDef *prismatic_joint_def = memnew(b2PrismaticJointDef);
 	prismatic_joint_def->collideConnected = disable_collisions;
@@ -99,8 +101,7 @@ void Box2DJoint::make_damped_spring(const Vector2 &p_anchor_a, const Vector2 &p_
 }
 
 void Box2DJoint::set_pin_softness(real_t p_softness) {
-	pin_softness = p_softness;
-	_recreate_joint();
+	pin_softness = p_softness; // unused
 }
 
 real_t Box2DJoint::get_pin_softness() {
@@ -109,26 +110,41 @@ real_t Box2DJoint::get_pin_softness() {
 
 void Box2DJoint::set_damped_spring_rest_length(real_t p_damped_spring_rest_length) {
 	damped_spring_rest_length = godot_to_box2d(p_damped_spring_rest_length);
-	_recreate_joint();
+	if (joint && (b2DistanceJoint *)joint) {
+		b2DistanceJoint *distance_joint = (b2DistanceJoint *)joint;
+		distance_joint->SetLength(damped_spring_rest_length);
+	}
 }
 real_t Box2DJoint::get_damped_spring_rest_length() {
 	return box2d_to_godot(damped_spring_rest_length);
 }
 
 void Box2DJoint::set_damped_spring_stiffness(real_t p_damped_spring_stiffness) {
-	damped_spring_stiffness = p_damped_spring_stiffness;
-	_recreate_joint();
+	damped_spring_stiffness = godot_to_box2d(p_damped_spring_stiffness);
+	if (joint && (b2DistanceJoint *)joint) {
+		b2DistanceJoint *distance_joint = (b2DistanceJoint *)joint;
+		float stiffness = 0;
+		float damping = 0;
+		b2LinearStiffness(stiffness, damping, damped_spring_stiffness, damped_spring_damping, body_a->get_b2Body(), body_b->get_b2Body());
+		distance_joint->SetStiffness(stiffness);
+	}
 }
 real_t Box2DJoint::get_damped_spring_stiffness() {
-	return damped_spring_stiffness;
+	return box2d_to_godot(damped_spring_stiffness);
 }
 
 void Box2DJoint::set_damped_spring_damping(real_t p_damped_spring_damping) {
-	damped_spring_damping = p_damped_spring_damping;
-	_recreate_joint();
+	damped_spring_damping = godot_to_box2d(p_damped_spring_damping);
+	if (joint && (b2DistanceJoint *)joint) {
+		b2DistanceJoint *distance_joint = (b2DistanceJoint *)joint;
+		float stiffness = 0;
+		float damping = 0;
+		b2LinearStiffness(stiffness, damping, damped_spring_stiffness, damped_spring_damping, body_a->get_b2Body(), body_b->get_b2Body());
+		distance_joint->SetStiffness(damping);
+	}
 }
 real_t Box2DJoint::get_damped_spring_damping() {
-	return damped_spring_damping;
+	return box2d_to_godot(damped_spring_damping);
 }
 
 Box2DBody *Box2DJoint::get_body_a() {
@@ -142,20 +158,24 @@ b2JointDef *Box2DJoint::get_b2JointDef() {
 	switch (type) {
 		case PhysicsServer2D::JointType::JOINT_TYPE_PIN: {
 			b2RevoluteJointDef *revolute_joint_def = (b2RevoluteJointDef *)joint_def;
+			revolute_joint_def->enableMotor = true;
 			revolute_joint_def->Initialize(body_a->get_b2Body(), body_b->get_b2Body(), anchor_a);
 		} break;
 		case PhysicsServer2D::JointType::JOINT_TYPE_DAMPED_SPRING: {
 			b2DistanceJointDef *distance_joint_def = (b2DistanceJointDef *)joint_def;
-			distance_joint_def->length = damped_spring_rest_length;
 			b2LinearStiffness(distance_joint_def->stiffness, distance_joint_def->damping, damped_spring_stiffness, damped_spring_damping, body_a->get_b2Body(), body_b->get_b2Body());
 			distance_joint_def->Initialize(body_a->get_b2Body(), body_b->get_b2Body(), anchor_a, anchor_b);
+
+			distance_joint_def->length = damped_spring_rest_length;
+			distance_joint_def->minLength = 0;
 		} break;
 		case PhysicsServer2D::JointType::JOINT_TYPE_GROOVE: {
-			b2Vec2 worldAxis(1.0f, 0.0f);
 			b2PrismaticJointDef *prismatic_joint_def = (b2PrismaticJointDef *)joint_def;
-			prismatic_joint_def->Initialize(body_a->get_b2Body(), body_b->get_b2Body(), body_b->get_b2Body()->GetPosition() + anchor_b, worldAxis);
-			prismatic_joint_def->lowerTranslation = std::min(groove_lower_translation, groove_upper_translation);
-			prismatic_joint_def->upperTranslation = std::max(groove_lower_translation, groove_upper_translation);
+			prismatic_joint_def->Initialize(body_a->get_b2Body(), body_b->get_b2Body(), anchor_b, groove_axis);
+			//prismatic_joint_def->lowerTranslation = std::min(groove_lower_translation, groove_upper_translation);
+			//prismatic_joint_def->upperTranslation = std::max(groove_lower_translation, groove_upper_translation);
+			prismatic_joint_def->lowerTranslation = -groove_lower_translation;
+			prismatic_joint_def->upperTranslation = groove_upper_translation;
 			prismatic_joint_def->enableLimit = true;
 		} break;
 		default: {

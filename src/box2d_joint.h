@@ -24,6 +24,7 @@ class Box2DJoint {
 	real_t damped_spring_damping = 0;
 	real_t groove_lower_translation = 0;
 	real_t groove_upper_translation = 0;
+	b2Vec2 groove_axis;
 	real_t bias = 0;
 	real_t max_bias = 0;
 	real_t max_force = 0;
