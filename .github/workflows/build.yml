@@ -10,7 +10,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [template_debug]
         os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v3
@@ -22,38 +21,52 @@ jobs:
           path: |
             ${{ github.workspace }}/.scons-cache/
             ${{ github.workspace }}/godot-cpp/.scons-cache/
-          key: ${{ matrix.os }}-${{ matrix.target }}
+          key: ${{ matrix.os }}
       - name: Setup python and scons
         uses: ./.github/actions/deps
       - name: Lint
         shell: sh
         run:
           clang-format
-      - name: Build Godot cpp
+      - name: Build Godot cpp template debug
         shell: sh
         env:
           SCONS_CACHE: .scons-cache
           SCONS_CACHE_DIR: .scons-cache
         run: |
-          cd godot-cpp && scons target=${{ matrix.target }} generate_bindings=yes
+          cd godot-cpp && scons target=template-debug generate_bindings=yes
+      - name: Build Godot cpp template release
+        shell: sh
+        env:
+          SCONS_CACHE: .scons-cache
+          SCONS_CACHE_DIR: .scons-cache
+        run: |
+          cd godot-cpp && scons target=template-release generate_bindings=yes
       - name: Build Physics Server Box2D
         shell: sh
         env:
           SCONS_CACHE: .scons-cache
           SCONS_CACHE_DIR: .scons-cache
         run: |
-          scons target=${{ matrix.target }} generate_bindings=no
+          scons target=template-debug generate_bindings=no
+      - name: Build Physics Server Box2D
+        shell: sh
+        env:
+          SCONS_CACHE: .scons-cache
+          SCONS_CACHE_DIR: .scons-cache
+        run: |
+          scons target=template-release generate_bindings=no
       - name: Save .scons_cache directory
         uses: actions/cache/save@v3
         with:
           path: |
             ${{ github.workspace }}/.scons-cache/
             ${{ github.workspace }}/godot-cpp/.scons-cache/
-          key: ${{ matrix.os }}-${{ matrix.target }}
+          key: ${{ matrix.os }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Physics Server Box2D - ${{ matrix.os }} - ${{ matrix.target }}
+          name: Physics Server Box2D - ${{ matrix.os }}
           path: |
             ${{ github.workspace }}/demo/bin/
             ${{ github.workspace }}/demo/physics_server_box2d.gdextension
