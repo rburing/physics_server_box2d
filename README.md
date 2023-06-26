@@ -1,6 +1,6 @@
 # PhysicsServerBox2D [![Physics Server Box2D Builds](https://github.com/Ughuuu/physics_server_box2d/actions/workflows/build.yml/badge.svg)](https://github.com/Ughuuu/physics_server_box2d/actions/workflows/build.yml)
 
-The Box2D one is on the left.
+The Box2D one is on the left. Overall it increases stability of larger simulations.
 
 ![testing](output.gif)
 
@@ -10,26 +10,26 @@ The goal of the project is to be a drop-in solution for 2D physics in Godot 4.0.
 
 ## Current state
 
-Not yet done and not many tests for all things. Ideally in the end I want to have videos of features from one and other physics system and just check that they perform the same.
-
-[x] - Rigidbody
+[x] - Rigidbody/Staticbody
 - missing lock rotation
 - missing contact monitor
 - missing excepted body
 
 [x] - Areas
-- for now just default area
-- for area point gravity not impl
+- just default area
+- area point gravity not done
 
 [x] - Shapes
-- skewed shapes don't work
+- skewed circles and capsules not impl
 - edge shape works only as static
 - polygon with more than 8 edges is made with lines instead of polygon(which only works static for now)
 
 [x] - Joints
-- Implemented but not tested thoroughly
+- Pin joint doesn't have softness impl
 
-[] - PhysicsServer, Box2DDirectSpaceState, Missing implementation for helper functions
+## Installing from builds
+
+Download from latest actions and put the `bin` folder and the `physics_server_box2d.gdextension` file.
 
 ## Building from source
 
