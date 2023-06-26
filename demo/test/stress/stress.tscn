@@ -11,6 +11,7 @@ size = Vector2(27.5, 563)
 [node name="stress" type="Node2D" node_paths=PackedStringArray("label")]
 position = Vector2(0, -408)
 script = ExtResource("1_xiuuu")
+total = 1400
 label = NodePath("Label")
 metadata/run_time = 15
 

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bh1oj182u2ook" path="res://test/stress/circle.tscn" id="2_ennbs"]
 
 [node name="stress_cirlce" type="Node2D"]
-metadata/run_time = 10
+metadata/run_time = 15
 
 [node name="stress" parent="." instance=ExtResource("1_rkar6")]
 node = ExtResource("2_ennbs")
