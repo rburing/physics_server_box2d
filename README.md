@@ -1,5 +1,4 @@
-# PhysicsServerBox2D
-
+# PhysicsServerBox2D [![Physics Server Box2D Builds](https://github.com/Ughuuu/physics_server_box2d/actions/workflows/build.yml/badge.svg)](https://github.com/Ughuuu/physics_server_box2d/actions/workflows/build.yml)
 ![testing](output.gif)
 
 An unofficial [**Box2D**](https://github.com/erincatto/box2d) physics server for [**Godot Engine**](https://github.com/godotengine/godot) 4.0, implemented as a GDExtension. This is a fork from [rburing/physics_server_box2d](https://github.com/rburing/physics_server_box2d), on top of which I continued implementing missing features.
