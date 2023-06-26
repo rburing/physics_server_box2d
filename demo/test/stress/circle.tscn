@@ -1,8 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://bh1oj182u2ook"]
+[gd_scene load_steps=3 format=3 uid="uid://bh1oj182u2ook"]
+
+[ext_resource type="Script" path="res://test/stress/random_circle.gd" id="1_pufkm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_clqxx"]
+resource_local_to_scene = true
 
 [node name="circle" type="RigidBody2D"]
+max_contacts_reported = 2
+contact_monitor = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_clqxx")
+script = ExtResource("1_pufkm")

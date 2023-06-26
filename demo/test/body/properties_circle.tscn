@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cuxa6mj5mdt3o"]
 
-[ext_resource type="Script" path="res://test/show_info_rb.gd" id="1_i2cyw"]
+[ext_resource type="Script" path="res://test/body/show_info_rb.gd" id="1_3prje"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_texwq"]
 
@@ -11,7 +11,7 @@ position = Vector2(-1, -99)
 center_of_mass_mode = 1
 constant_force = Vector2(1, 1)
 constant_torque = 10.0
-script = ExtResource("1_i2cyw")
+script = ExtResource("1_3prje")
 
 [node name="Camera2D" type="Camera2D" parent="Circle"]
 position = Vector2(4, 152)

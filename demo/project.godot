@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=640
 window/size/viewport_height=720
+window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
@@ -26,4 +27,4 @@ enabled=PackedStringArray()
 
 [physics]
 
-2d/physics_engine="GodotPhysics2D"
+2d/physics_engine="Box2D"

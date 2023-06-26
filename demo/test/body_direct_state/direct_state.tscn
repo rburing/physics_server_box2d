@@ -1,0 +1,147 @@
+[gd_scene load_steps=12 format=3 uid="uid://dj5cgf8kkk6gl"]
+
+[ext_resource type="Script" path="res://test/body_direct_state/show_body_state.gd" id="1_y1c8k"]
+[ext_resource type="Script" path="res://test/body_direct_state/add_constant_force.gd" id="2_k33x1"]
+[ext_resource type="Script" path="res://test/body_direct_state/set_constant_force.gd" id="3_vd5hq"]
+[ext_resource type="Script" path="res://test/body_direct_state/add_constant_torque.gd" id="4_a5667"]
+[ext_resource type="Script" path="res://test/body_direct_state/set_constant_torque.gd" id="5_5yncj"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_krbkf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b4m2t"]
+size = Vector2(500, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2xvw2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7dj2o"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dp28q"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qurbh"]
+
+[node name="direct_state" type="Node2D"]
+metadata/run_time = 4
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(-0.22, -0.83)
+physics_material_override = SubResource("PhysicsMaterial_krbkf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-3.78, 102.83)
+shape = SubResource("RectangleShape2D_b4m2t")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-1.78, -292.17)
+shape = SubResource("RectangleShape2D_b4m2t")
+
+[node name="Label3" type="Label" parent="."]
+offset_left = -297.0
+offset_top = -363.0
+offset_right = -145.0
+offset_bottom = -337.0
+text = "Circle Direct State"
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2(-233, -336)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+can_sleep = false
+linear_damp = 1.06
+script = ExtResource("1_y1c8k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_2xvw2")
+
+[node name="Label4" type="Label" parent="."]
+offset_left = -11.0
+offset_top = -364.0
+offset_right = 141.0
+offset_bottom = -338.0
+text = "Box Direct State"
+
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+position = Vector2(25, -338)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+can_sleep = false
+linear_damp = 1.06
+script = ExtResource("1_y1c8k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
+shape = SubResource("RectangleShape2D_7dj2o")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -275.0
+offset_top = 22.0
+offset_right = -123.0
+offset_bottom = 48.0
+text = "Add Constant Force"
+
+[node name="Add Constant Force" type="RigidBody2D" parent="."]
+position = Vector2(-224, 67)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+linear_damp = 1.06
+script = ExtResource("2_k33x1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Add Constant Force"]
+shape = SubResource("CircleShape2D_dp28q")
+
+[node name="Label2" type="Label" parent="."]
+offset_left = -108.0
+offset_top = 24.0
+offset_right = 44.0
+offset_bottom = 50.0
+text = "Set Constant Force"
+
+[node name="Set Constant Force" type="RigidBody2D" parent="."]
+position = Vector2(-94, 71)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+linear_damp = 1.06
+script = ExtResource("3_vd5hq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Set Constant Force"]
+shape = SubResource("CircleShape2D_dp28q")
+
+[node name="Label5" type="Label" parent="."]
+offset_left = 48.0
+offset_top = 28.0
+offset_right = 212.0
+offset_bottom = 54.0
+text = "Add Constant Torque"
+
+[node name="Add Constant Torque" type="RigidBody2D" parent="."]
+position = Vector2(62, 75)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+linear_damp = 1.06
+script = ExtResource("4_a5667")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Add Constant Torque"]
+shape = SubResource("RectangleShape2D_qurbh")
+
+[node name="Label6" type="Label" parent="."]
+offset_left = 144.0
+offset_top = 11.0
+offset_right = 308.0
+offset_bottom = 37.0
+text = "Set Constant Torque"
+
+[node name="Add Constant Torque2" type="RigidBody2D" parent="."]
+position = Vector2(158, 58)
+continuous_cd = 2
+max_contacts_reported = 10
+contact_monitor = true
+linear_damp = 1.06
+script = ExtResource("5_5yncj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Add Constant Torque2"]
+shape = SubResource("RectangleShape2D_qurbh")

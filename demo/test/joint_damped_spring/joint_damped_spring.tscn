@@ -1,0 +1,113 @@
+[gd_scene load_steps=4 format=3 uid="uid://bibre25swgifv"]
+
+[ext_resource type="Script" path="res://test/joints_pin/show_pin_join_info.gd" id="1_5gw02"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qq0ud"]
+size = Vector2(524, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1vy7i"]
+
+[node name="joint_pin" type="Node2D"]
+metadata/run_time = 3
+
+[node name="Label" type="Label" parent="."]
+offset_left = -88.0
+offset_top = -344.0
+offset_right = 84.0
+offset_bottom = -318.0
+text = "Damped Spring Joint"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 212)
+shape = SubResource("RectangleShape2D_qq0ud")
+
+[node name="PinJoint2D2" type="DampedSpringJoint2D" parent="."]
+rotation = -0.00440406
+node_a = NodePath("../RigidBody2D")
+node_b = NodePath("../RigidBody2D2")
+length = 20.0
+script = ExtResource("1_5gw02")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+position = Vector2(-2, 50)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D2"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(72, -40)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D3"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D4" type="RigidBody2D" parent="."]
+position = Vector2(-65, 54)
+mass = 0.1
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D4"]
+position = Vector2(4, -206)
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="PinJoint2D" type="DampedSpringJoint2D" parent="."]
+position = Vector2(72, -40)
+rotation = 2.27918
+node_a = NodePath("../RigidBody2D3")
+node_b = NodePath("../RigidBody2D4")
+bias = 0.9
+length = 170.0
+rest_length = 50.0
+script = ExtResource("1_5gw02")
+
+[node name="RigidBody2D5" type="StaticBody2D" parent="."]
+position = Vector2(-122, -34)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D5"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D6" type="RigidBody2D" parent="."]
+position = Vector2(-217, 79)
+mass = 0.1
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D6"]
+position = Vector2(-44, -18)
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="PinJoint2D3" type="DampedSpringJoint2D" parent="."]
+position = Vector2(-122, -34)
+rotation = 0.981053
+node_a = NodePath("../RigidBody2D5")
+node_b = NodePath("../RigidBody2D6")
+bias = 0.9
+length = 170.0
+rest_length = 150.0
+script = ExtResource("1_5gw02")
+
+[node name="Label2" type="Label" parent="."]
+offset_left = -197.0
+offset_top = -82.0
+offset_right = -157.0
+offset_bottom = -59.0
+text = "With large rest"
+
+[node name="Label3" type="Label" parent="."]
+offset_left = 30.0
+offset_top = -85.0
+offset_right = 146.0
+offset_bottom = -59.0
+text = "With small rest"
+
+[node name="Label4" type="Label" parent="."]
+offset_left = -39.0
+offset_top = 120.0
+offset_right = 1.0
+offset_bottom = 143.0
+text = "With two rigidbodies"

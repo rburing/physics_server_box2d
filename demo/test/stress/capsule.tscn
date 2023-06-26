@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cej5kjgsq512e"]
+
+[ext_resource type="Script" path="res://test/stress/random_capsule.gd" id="1_726lv"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ua4xv"]
+resource_local_to_scene = true
+radius = 15.0
+
+[node name="capsule" type="RigidBody2D"]
+max_contacts_reported = 2
+contact_monitor = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_ua4xv")
+script = ExtResource("1_726lv")

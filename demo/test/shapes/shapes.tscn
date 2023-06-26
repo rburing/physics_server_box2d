@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://c7hwetrhwy0un"]
+[gd_scene load_steps=10 format=3 uid="uid://c7hwetrhwy0un"]
 
-[ext_resource type="Script" path="res://test/show_info_awake.gd" id="1_dvldo"]
+[ext_resource type="Script" path="res://test/shapes/show_info_awake.gd" id="1_exs8i"]
+[ext_resource type="Script" path="res://test/shapes/show_process_info.gd" id="1_opawd"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ny7ad"]
 
@@ -22,8 +23,11 @@ points = PackedVector2Array(0, 0, 10, 2.08165e-12, 10, 2.08165e-12, 10, 10, 10, 
 [node name="shapes" type="Node2D"]
 metadata/run_time = 5
 
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(-143, -125)
+script = ExtResource("1_opawd")
+
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
 
 [node name="WorldBoundary" type="StaticBody2D" parent="."]
 position = Vector2(-1, 104)
@@ -34,7 +38,7 @@ shape = SubResource("WorldBoundaryShape2D_cqo5a")
 
 [node name="Circle" type="RigidBody2D" parent="."]
 position = Vector2(-30, -25)
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Circle"]
 position = Vector2(-3, -3)
@@ -55,7 +59,7 @@ continuous_cd = 2
 max_contacts_reported = 10
 contact_monitor = true
 linear_damp = 1.06
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Square"]
 position = Vector2(-4, -3)
@@ -75,7 +79,7 @@ position = Vector2(-7, -28)
 continuous_cd = 2
 max_contacts_reported = 10
 contact_monitor = true
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Capsule"]
 position = Vector2(-3, 2)
@@ -96,7 +100,7 @@ continuous_cd = 2
 max_contacts_reported = 10
 contact_monitor = true
 linear_damp = 1.06
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CollisionPolygonConvex_complex"]
 position = Vector2(1, -4)
@@ -117,7 +121,7 @@ continuous_cd = 2
 max_contacts_reported = 10
 contact_monitor = true
 linear_damp = 1.06
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CollisionPolygonConvex_simple"]
 position = Vector2(1, -4)
@@ -138,7 +142,7 @@ continuous_cd = 2
 max_contacts_reported = 10
 contact_monitor = true
 linear_damp = 1.06
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CollisionPolygonConcave_simple"]
 position = Vector2(-4, -5)
@@ -157,7 +161,7 @@ polygon = PackedVector2Array(-1, -17, 16, 8, 0, -2, -16, 1)
 [node name="Segment" type="RigidBody2D" parent="."]
 position = Vector2(-61, -80)
 rotation = -0.3629
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Segment"]
 position = Vector2(2, -1)
@@ -175,7 +179,7 @@ shape = SubResource("SegmentShape2D_adcah")
 
 [node name="Polygon" type="RigidBody2D" parent="."]
 position = Vector2(-71, -55)
-script = ExtResource("1_dvldo")
+script = ExtResource("1_exs8i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Polygon"]
 position = Vector2(-4, 3)
@@ -191,8 +195,15 @@ rotation = -0.626824
 shape = SubResource("ConvexPolygonShape2D_8fp0m")
 
 [node name="Label" type="Label" parent="."]
-offset_left = -147.0
-offset_top = -170.0
-offset_right = -10.0
-offset_bottom = -144.0
+offset_left = 2.0
+offset_top = -111.0
+offset_right = 139.0
+offset_bottom = -85.0
 text = "Shape Types Test"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = -149.0
+offset_top = -160.0
+offset_right = -12.0
+offset_bottom = -134.0
+text = "Process Info"

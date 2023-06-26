@@ -1,0 +1,92 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxmp20knfugsp"]
+
+[ext_resource type="Script" path="res://test/joints_pin/show_pin_join_info.gd" id="1_dsmj4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qq0ud"]
+size = Vector2(524, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1vy7i"]
+
+[node name="joint_pin" type="Node2D"]
+metadata/run_time = 3
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 212)
+shape = SubResource("RectangleShape2D_qq0ud")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+
+[node name="PinJoint2D" type="GrooveJoint2D" parent="RigidBody2D"]
+position = Vector2(1, 1.99998)
+rotation = -6.18936
+node_a = NodePath("..")
+node_b = NodePath("../../RigidBody2D2")
+initial_offset = 45.0
+script = ExtResource("1_dsmj4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+position = Vector2(-2, 50)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D2"]
+position = Vector2(-2, -2)
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(72, -40)
+
+[node name="PinJoint2D" type="GrooveJoint2D" parent="RigidBody2D3"]
+rotation = 2.0818
+node_a = NodePath("..")
+node_b = NodePath("../../RigidBody2D4")
+length = 140.0
+initial_offset = 130.0
+script = ExtResource("1_dsmj4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D3"]
+rotation = 0.606218
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D4" type="RigidBody2D" parent="."]
+position = Vector2(-66, -116)
+rotation = 0.276219
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D4"]
+position = Vector2(23.2039, 4.85591)
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D5" type="StaticBody2D" parent="."]
+position = Vector2(-67, 23)
+rotation = -0.898482
+
+[node name="PinJoint2D" type="GrooveJoint2D" parent="RigidBody2D5"]
+rotation = 2.0818
+node_a = NodePath("..")
+node_b = NodePath("../../RigidBody2D6")
+length = 140.0
+initial_offset = 45.0
+script = ExtResource("1_dsmj4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D5"]
+rotation = 0.606218
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="RigidBody2D6" type="RigidBody2D" parent="."]
+position = Vector2(-105, 44)
+rotation = -0.622263
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D6"]
+shape = SubResource("CircleShape2D_1vy7i")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -304.0
+offset_right = 56.0
+offset_bottom = -278.0
+text = "Groove Joint"

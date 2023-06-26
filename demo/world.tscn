@@ -1,14 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://bkd3jvy83di6t"]
+[gd_scene load_steps=10 format=3 uid="uid://bkd3jvy83di6t"]
 
 [ext_resource type="Script" path="res://load_all.gd" id="1_rw7wb"]
 [ext_resource type="PackedScene" uid="uid://qkydtngukmpk" path="res://test/areas/default_area.tscn" id="2_hqgsh"]
 [ext_resource type="PackedScene" uid="uid://c7hwetrhwy0un" path="res://test/shapes/shapes.tscn" id="3_ijr2j"]
+[ext_resource type="PackedScene" uid="uid://dj5cgf8kkk6gl" path="res://test/body_direct_state/direct_state.tscn" id="4_djkpf"]
 [ext_resource type="PackedScene" uid="uid://c2qhd3ltp0vfh" path="res://test/stress/stress_circle.tscn" id="4_eu55f"]
 [ext_resource type="PackedScene" uid="uid://d0hx6ba75xde2" path="res://test/stress/stress_square.tscn" id="5_ci8on"]
+[ext_resource type="PackedScene" uid="uid://dpg4667bomiaw" path="res://test/joints_pin/joint_pin.tscn" id="6_aeyme"]
+[ext_resource type="PackedScene" uid="uid://bibre25swgifv" path="res://test/joint_damped_spring/joint_damped_spring.tscn" id="7_58elh"]
+[ext_resource type="PackedScene" uid="uid://cxmp20knfugsp" path="res://test/join_groove/joint_groove.tscn" id="8_6jjpw"]
 
 [node name="World" type="Node2D" node_paths=PackedStringArray("label")]
 script = ExtResource("1_rw7wb")
-scenes = Array[PackedScene]([ExtResource("4_eu55f"), ExtResource("5_ci8on"), ExtResource("3_ijr2j"), ExtResource("2_hqgsh")])
+scenes = Array[PackedScene]([ExtResource("4_eu55f"), ExtResource("5_ci8on"), ExtResource("4_djkpf"), ExtResource("3_ijr2j"), ExtResource("6_aeyme"), ExtResource("7_58elh"), ExtResource("8_6jjpw"), ExtResource("2_hqgsh")])
 label = NodePath("Label")
 
 [node name="Camera2D" type="Camera2D" parent="."]
