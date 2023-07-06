@@ -1,4 +1,5 @@
 #include "physics_server_box2d.h"
+#include "box2d_sweep_test.h"
 
 #include "../bodies/box2d_direct_body_state.h"
 #include "../shapes/box2d_shape_capsule.h"
@@ -117,27 +118,40 @@ double PhysicsServerBox2D::_shape_get_custom_solver_bias(const RID &shape) const
 }
 
 bool PhysicsServerBox2D::_shape_collide(const RID &p_shape_A, const Transform2D &p_xform_A, const Vector2 &p_motion_A, const RID &p_shape_B, const Transform2D &p_xform_B, const Vector2 &p_motion_B, void *p_results, int32_t p_result_max, int32_t *p_result_count) {
-	/*
+	if (p_result_max == 0) {
+		return false;
+	}
 	const Box2DShape *shape_A = shape_owner.get_or_null(p_shape_A);
 	const Box2DShape *shape_B = shape_owner.get_or_null(p_shape_B);
 	ERR_FAIL_COND_V(!shape_A, false);
 	ERR_FAIL_COND_V(!shape_B, false);
-	b2Shape *shapeA = shape_A->get_b2Shape();
-	b2Shape *shapeB = shape_B->get_b2Shape();
-	ERR_FAIL_COND_V(!shapeA, false);
-	ERR_FAIL_COND_V(!shapeB, false);
+	b2Body *bodyA = shape_A->get_body()->get_b2Body();
+	b2Body *bodyB = shape_B->get_body()->get_b2Body();
+	ERR_FAIL_COND_V(!bodyA, false);
+	ERR_FAIL_COND_V(!bodyB, false);
+	Vector<b2Shape *> shapesA = shape_A->get_b2_shapes();
+	Vector<b2Shape *> shapesB = shape_B->get_b2_shapes();
 	b2Transform xfA(godot_to_box2d(p_xform_A.get_origin()), b2Rot(p_xform_A.get_rotation()));
 	b2Transform xfB(godot_to_box2d(p_xform_B.get_origin()), b2Rot(p_xform_B.get_rotation()));
 	bool overlap = false;
-	for (int iA=0;iA<shape_A->get_b2Shape_count();iA++) {
-		for (int iB=0;iB<shape_B->get_b2Shape_count();iB++) {
-			overlap |= b2TestOverlap(shapeA, iA, shapeB, iB, xfA, xfB);
+	int result_count = 0;
+	b2Sweep sweepA = Box2DSweepTest::create_b2_sweep(xfA, bodyA->GetLocalCenter(), godot_to_box2d(p_motion_A));
+	b2Sweep sweepB = Box2DSweepTest::create_b2_sweep(xfB, bodyB->GetLocalCenter(), godot_to_box2d(p_motion_B));
+	auto *results = static_cast<Vector2 *>(p_results);
+	int intersect_count = 0;
+	for (b2Shape *b2_shapeA : shapesA) {
+		for (b2Shape *b2_shapeB : shapesB) {
+			Box2DSweepTest::Box2DSweepTestResult output = Box2DSweepTest::shape_cast(xfA, b2_shapeA, sweepA, xfB, b2_shapeB, sweepB, step_amount);
+			if (output.intersects) {
+				results[intersect_count++] = box2d_to_godot(output.output.pointA);
+				if (intersect_count >= p_result_max) {
+					return true;
+				}
+			}
 		}
 	}
-	*p_result_count = 0;
-	return overlap;
-	*/
-	return false;
+
+	return *p_result_count != 0;
 }
 
 /* SPACE API */
@@ -146,6 +160,7 @@ RID PhysicsServerBox2D::_space_create() {
 	Box2DSpace *space = memnew(Box2DSpace);
 	RID id = space_owner.make_rid(space);
 	space->set_self(id);
+	space->set_server(this);
 	return id;
 }
 
@@ -559,6 +574,7 @@ void PhysicsServerBox2D::_body_add_shape(const RID &p_body, const RID &p_shape, 
 	ERR_FAIL_COND(!shape);
 
 	body->add_shape(shape, p_transform, p_disabled);
+	shape->set_body(body);
 }
 
 void PhysicsServerBox2D::_body_set_shape(const RID &p_body, int32_t p_shape_idx, const RID &p_shape) {
@@ -570,6 +586,7 @@ void PhysicsServerBox2D::_body_set_shape(const RID &p_body, int32_t p_shape_idx,
 	ERR_FAIL_COND(!shape->is_configured());
 
 	body->set_shape(p_shape_idx, shape);
+	shape->set_body(body);
 }
 
 void PhysicsServerBox2D::_body_set_shape_transform(const RID &p_body, int32_t p_shape_idx, const Transform2D &p_transform) {
@@ -606,7 +623,10 @@ Transform2D PhysicsServerBox2D::_body_get_shape_transform(const RID &p_body, int
 void PhysicsServerBox2D::_body_remove_shape(const RID &p_body, int32_t p_shape_idx) {
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND(!body);
+	Box2DShape *shape = body->get_shape(p_shape_idx);
+	ERR_FAIL_COND(!shape);
 	body->remove_shape(p_shape_idx);
+	shape->set_body(body);
 }
 
 void PhysicsServerBox2D::_body_clear_shapes(const RID &p_body) {
@@ -614,6 +634,9 @@ void PhysicsServerBox2D::_body_clear_shapes(const RID &p_body) {
 	ERR_FAIL_COND(!body);
 
 	while (body->get_shape_count()) {
+		Box2DShape *shape = body->get_shape(0);
+		ERR_FAIL_COND(!shape);
+		shape->set_body(body);
 		body->remove_shape(0);
 	}
 }
@@ -1144,6 +1167,7 @@ void PhysicsServerBox2D::_init() {
 }
 
 void PhysicsServerBox2D::_step(double p_step) {
+	step_amount = p_step;
 	if (!active) {
 		return;
 	}

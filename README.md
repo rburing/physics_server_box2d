@@ -12,16 +12,14 @@ Missing functionality:
 
 - Skewed/scaled shapes.
 - Separation Ray works as a segment.
-- Kinematic bodies.
 - Pin joint doesn't have softness
 - Some joint properties(max force, etc.)
-- Queries using Direct Space State.
 
 Things that work:
 
 Bodies:
 - [x] Rigid Body
-- [] Kinematic Body
+- [x] Kinematic Body
 - [x] Static Body
 - [x] Area
 
@@ -42,7 +40,7 @@ Shapes:
 
 Direct State:
 - [x] Direct Body State
-- [] Direct Space State
+- [x] Direct Space State
 
 ## Building from source
 

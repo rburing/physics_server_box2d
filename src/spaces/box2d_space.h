@@ -16,10 +16,12 @@ class Box2DJoint;
 class Box2DSpaceContactFilter;
 class Box2DSpaceContactListener;
 class Box2DArea;
+class PhysicsServerBox2D;
 
 class Box2DSpace {
 private:
 	RID self;
+	PhysicsServerBox2D *server;
 
 	b2World *world = nullptr;
 
@@ -37,6 +39,8 @@ private:
 	Box2DSpaceContactListener *contact_listener;
 	int step_count = 0; // used for caching
 public:
+	PhysicsServerBox2D *get_server();
+	void set_server(PhysicsServerBox2D *p_server);
 	/* PHYSICS SERVER API */
 	int32_t get_active_body_count();
 

@@ -2,39 +2,25 @@
 
 #include "../b2_user_settings.h"
 
-Box2DQueryCallback::Box2DQueryCallback(PhysicsServer2DExtensionShapeResult *p_results,
-		uint32_t p_collision_mask,
+Box2DQueryCallback::Box2DQueryCallback(uint32_t p_collision_mask,
 		bool p_collide_with_bodies,
-		bool p_collide_with_areas,
-		uint64_t p_canvas_instance_id,
-		int32_t p_max_results) {
-	results = p_results;
+		bool p_collide_with_areas) {
 	collision_mask = p_collision_mask;
 	collide_with_bodies = p_collide_with_bodies;
 	collide_with_areas = p_collide_with_areas;
-	canvas_instance_id = p_canvas_instance_id;
-	max_results = p_max_results;
 }
 
-int32_t Box2DQueryCallback::get_hit_count() {
-	return hit_count;
+Vector<b2Fixture *> Box2DQueryCallback::get_results() {
+	return results;
 }
 
 bool Box2DQueryCallback::ReportFixture(b2Fixture *fixture) {
-	if ((fixture->GetFilterData().maskBits & collision_mask) != 0 &&
+	if ( // collision mask
+			((fixture->GetFilterData().maskBits & collision_mask) != 0) &&
+			// collide with area or body bit
 			((fixture->IsSensor() && collide_with_areas) ||
 					(!fixture->IsSensor() && collide_with_bodies))) {
-		hit_count++;
-		PhysicsServer2DExtensionShapeResult &result = *results++;
-
-		Box2DCollisionObject *collision_object = fixture->GetBody()->GetUserData().collision_object;
-		if (collision_object->get_canvas_instance_id() != godot::ObjectID(canvas_instance_id)) {
-			return false;
-		}
-		result.shape = fixture->GetUserData().shape_idx;
-		result.rid = collision_object->get_self();
-		result.collider_id = collision_object->get_object_instance_id();
-		result.collider = collision_object->get_object();
+		results.append(fixture);
 	}
-	return max_results - hit_count > 0;
+	return true;
 }

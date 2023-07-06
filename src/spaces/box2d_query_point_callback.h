@@ -9,17 +9,23 @@
 
 using namespace godot;
 
-class Box2DQueryCallback : public b2QueryCallback {
+class Box2DQueryPointCallback : public b2QueryCallback {
 	Vector<b2Fixture *> results;
 	uint32_t collision_mask;
 	bool collide_with_bodies;
 	bool collide_with_areas;
+	uint64_t canvas_instance_id;
+	b2Vec2 position;
+	int32_t max_results;
 	int hit_count = 0;
 
 public:
-	Box2DQueryCallback(uint32_t collision_mask,
+	Box2DQueryPointCallback(uint32_t collision_mask,
 			bool collide_with_bodies,
-			bool collide_with_areas);
+			bool collide_with_areas,
+			uint64_t canvas_instance_id,
+			b2Vec2 p_position,
+			int32_t max_results);
 
 	Vector<b2Fixture *> get_results();
 

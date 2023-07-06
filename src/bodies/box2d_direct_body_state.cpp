@@ -137,6 +137,10 @@ int32_t Box2DDirectBodyState::_get_contact_local_shape(int32_t contact_idx) cons
 	ERR_FAIL_NULL_V(body, 0);
 	return body->get_contact_local_shape(contact_idx);
 }
+Vector2 Box2DDirectBodyState::_get_contact_local_velocity_at_position(int32_t contact_idx) const {
+	ERR_FAIL_NULL_V(body, Vector2());
+	return body->get_contact_local_velocity_at_position(contact_idx);
+}
 RID Box2DDirectBodyState::_get_contact_collider(int32_t contact_idx) const {
 	ERR_FAIL_NULL_V(body, RID());
 	return body->get_contact_collider(contact_idx);

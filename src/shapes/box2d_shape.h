@@ -15,6 +15,8 @@ class Box2DCollisionObject;
 
 class Box2DShape {
 	RID self;
+	Box2DCollisionObject *body;
+	Vector<b2Shape *> shapes;
 
 protected:
 	bool configured = false;
@@ -22,6 +24,12 @@ protected:
 
 public:
 	_FORCE_INLINE_ PhysicsServer2D::ShapeType get_type() const { return type; }
+
+	void set_body(Box2DCollisionObject *p_body);
+	Box2DCollisionObject *get_body() const;
+
+	void add_b2_shape(b2Shape *p_shape);
+	Vector<b2Shape *> get_b2_shapes() const;
 
 	_FORCE_INLINE_ void set_self(const RID &p_self) { self = p_self; }
 	_FORCE_INLINE_ RID get_self() const { return self; }

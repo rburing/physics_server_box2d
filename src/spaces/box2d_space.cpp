@@ -7,10 +7,17 @@
 
 #include "../bodies/box2d_body.h"
 #include "../bodies/box2d_collision_object.h"
+#include "../servers/physics_server_box2d.h"
 #include "box2d_direct_space_state.h"
 #include "box2d_space_contact_filter.h"
 #include "box2d_space_contact_listener.h"
 
+PhysicsServerBox2D *Box2DSpace::get_server() {
+	return server;
+}
+void Box2DSpace::set_server(PhysicsServerBox2D *p_server) {
+	server = p_server;
+}
 /* PHYSICS SERVER API */
 
 int Box2DSpace::get_active_body_count() {
