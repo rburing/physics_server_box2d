@@ -16,6 +16,7 @@ PhysicsDirectSpaceState2D *Box2DDirectSpaceState::get_space_state() {
 }
 
 bool Box2DDirectSpaceState::_intersect_ray(const Vector2 &from, const Vector2 &to, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, bool hit_from_inside, PhysicsServer2DExtensionRayResult *result) {
+	// TODO take into account hit_from_inside
 	Box2DRayCastCallback callback(result, collision_mask, collide_with_bodies, collide_with_areas, hit_from_inside);
 	space->get_b2World()->RayCast(&callback, godot_to_box2d(from), godot_to_box2d(to));
 	return callback.get_hit();

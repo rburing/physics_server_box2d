@@ -2,6 +2,7 @@
 
 #include <godot_cpp/classes/physics_server2d.hpp>
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/core/object.hpp>
 #include <godot_cpp/templates/hash_set.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/rid.hpp>

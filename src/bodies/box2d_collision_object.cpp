@@ -521,7 +521,7 @@ Object *Box2DCollisionObject::get_object() const {
 	return ObjectDB::get_instance(id);
 }
 Object *Box2DCollisionObject::get_object_unsafe() const {
-	return reinterpret_cast<Object *>(internal::gde_interface->object_get_instance_from_id(object_instance_id));
+	return reinterpret_cast<Object *>((GodotObject *)(internal::gdextension_interface_object_get_instance_from_id(object_instance_id)));
 	;
 }
 

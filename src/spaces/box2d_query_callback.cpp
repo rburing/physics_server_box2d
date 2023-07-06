@@ -26,8 +26,12 @@ bool Box2DQueryCallback::ReportFixture(b2Fixture *fixture) {
 					(!fixture->IsSensor() && collide_with_bodies))) {
 		hit_count++;
 		PhysicsServer2DExtensionShapeResult &result = *results++;
-		result.shape = fixture->GetUserData().shape_idx;
+
 		Box2DCollisionObject *collision_object = fixture->GetBody()->GetUserData().collision_object;
+		if (collision_object->get_canvas_instance_id() != godot::ObjectID(canvas_instance_id)) {
+			return false;
+		}
+		result.shape = fixture->GetUserData().shape_idx;
 		result.rid = collision_object->get_self();
 		result.collider_id = collision_object->get_object_instance_id();
 		result.collider = collision_object->get_object();

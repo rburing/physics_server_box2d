@@ -1,14 +1,48 @@
 # PhysicsServerBox2D
 
-An unofficial [**Box2D**](https://github.com/erincatto/box2d) physics server for [**Godot Engine**](https://github.com/godotengine/godot) 4.0, implemented as a GDExtension.
+An unofficial [**Box2D**](https://github.com/erincatto/box2d) physics server for [**Godot Engine**](https://github.com/godotengine/godot) 4.1, implemented as a GDExtension.
 
-The goal of the project is to be a drop-in solution for 2D physics in Godot 4.0. In your Godot project you can load the GDExtension, change the (advanced) project setting `physics/2d/physics_engine` to `Box2D`, and it will work with Godot's original 2D physics nodes such as `RigidBody2D` and `StaticBody2D`.
+The goal of the project is to be a drop-in solution for 2D physics in Godot 4.1. In your Godot project you can load the GDExtension, change the (advanced) project setting `physics/2d/physics_engine` to `Box2D`, and it will work with Godot's original 2D physics nodes such as `RigidBody2D` and `StaticBody2D`.
 
 ## Current state
 
-⚠ This project is a work in progress, still in a very early stage. ⚠
+⚠ This project is a work in progress. ⚠
 
-Runtime errors of the form `Required virtual method ... must be overridden before calling` reflect this unfinished state, and they hint at which functionality is still missing.
+Missing functionality:
+
+- Skewed/scaled shapes.
+- Separation Ray works as a segment.
+- Kinematic bodies.
+- Pin joint doesn't have softness
+- Some joint properties(max force, etc.)
+- Queries using Direct Space State.
+
+Things that work:
+
+Bodies:
+- [x] Rigid Body
+- [] Kinematic Body
+- [x] Static Body
+- [x] Area
+
+Joints:
+- [x] Pin Joint
+- [x] Damped Spring Joint
+- [x] Groove Joint
+
+Shapes:
+- [x] Capsule Shape
+- [x] Circle Shape
+- [x] Concave Polygon Shape
+- [x] Convex Polygon Shape
+- [x] Rectangle Shape
+- [x] Segment Shape
+- [x] Separation Ray Shape
+- [x] World Boundary Shape
+
+Direct State:
+- [x] Direct Body State
+- [] Direct Space State
 
 ## Building from source
 
