@@ -9,7 +9,10 @@
 
 using namespace godot;
 
+class Box2DDirectSpaceState;
+
 class Box2DQueryCallback : public b2QueryCallback {
+	Box2DDirectSpaceState *space_state;
 	Vector<b2Fixture *> results;
 	uint32_t collision_mask;
 	bool collide_with_bodies;
@@ -17,7 +20,8 @@ class Box2DQueryCallback : public b2QueryCallback {
 	int hit_count = 0;
 
 public:
-	Box2DQueryCallback(uint32_t collision_mask,
+	Box2DQueryCallback(Box2DDirectSpaceState *space_state,
+			uint32_t collision_mask,
 			bool collide_with_bodies,
 			bool collide_with_areas);
 

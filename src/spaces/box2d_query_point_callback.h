@@ -8,22 +8,27 @@
 #include <godot_cpp/classes/physics_server2d_extension_shape_result.hpp>
 
 using namespace godot;
+class Box2DDirectSpaceState;
 
 class Box2DQueryPointCallback : public b2QueryCallback {
+	Box2DDirectSpaceState *space_state;
 	Vector<b2Fixture *> results;
 	uint32_t collision_mask;
 	bool collide_with_bodies;
 	bool collide_with_areas;
+	bool check_canvas_instance_id;
 	uint64_t canvas_instance_id;
 	b2Vec2 position;
 	int32_t max_results;
 	int hit_count = 0;
 
 public:
-	Box2DQueryPointCallback(uint32_t collision_mask,
+	Box2DQueryPointCallback(Box2DDirectSpaceState *space_state,
+			uint32_t collision_mask,
 			bool collide_with_bodies,
 			bool collide_with_areas,
 			uint64_t canvas_instance_id,
+			bool check_canvas_instance_id,
 			b2Vec2 p_position,
 			int32_t max_results);
 

@@ -15,9 +15,3 @@ void Box2DShape::set_body(Box2DCollisionObject *p_body) {
 Box2DCollisionObject *Box2DShape::get_body() const {
 	return body;
 }
-void Box2DShape::add_b2_shape(b2Shape *p_shape) {
-	shapes.append(p_shape);
-}
-Vector<b2Shape *> Box2DShape::get_b2_shapes() const {
-	return shapes;
-}

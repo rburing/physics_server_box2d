@@ -14,7 +14,7 @@ b2Sweep Box2DSweepTest::create_b2_sweep(b2Transform p_transform, b2Vec2 p_center
 	sweep.alpha0 = 0;
 	return sweep;
 }
-Box2DSweepTest::Box2DSweepTestResult Box2DSweepTest::shape_cast(b2Transform p_transformA, b2Shape *shapeA, b2Sweep p_sweepA, b2Transform p_transformB, b2Shape *shapeB, b2Sweep p_sweepB, float step_amount) {
+Box2DSweepTest::Box2DSweepTestResult Box2DSweepTest::shape_cast(b2Transform p_transformA, b2Shape *shapeA, b2Body *bodyA, b2Sweep p_sweepA, b2Transform p_transformB, b2Shape *shapeB, b2Body *bodyB, b2Sweep p_sweepB, float step_amount) {
 	b2TOIInput input;
 	b2TOIOutput output;
 	input.tMax = step_amount;
@@ -27,9 +27,11 @@ Box2DSweepTest::Box2DSweepTestResult Box2DSweepTest::shape_cast(b2Transform p_tr
 	if (is_colliding) {
 		p_sweepA.GetTransform(&p_transformA, step_amount);
 		p_sweepB.GetTransform(&p_transformB, step_amount);
-		return Box2DSweepTestResult{ p_transformA, call_b2_distance(p_transformA, shapeA, p_transformB, shapeB), true };
+		b2DistanceOutput output = call_b2_distance(p_transformA, shapeA, p_transformB, shapeB);
+		float distance = (p_transformA.p + output.pointA - p_sweepA.c0).Length();
+		return Box2DSweepTestResult{ shapeA, bodyA, shapeB, bodyB, p_transformA, distance, output, true };
 	}
-	return Box2DSweepTestResult{ b2Transform(), b2DistanceOutput(), false };
+	return Box2DSweepTestResult{ nullptr, nullptr, nullptr, nullptr, b2Transform(), 0.0f, b2DistanceOutput(), false };
 }
 
 b2DistanceOutput Box2DSweepTest::call_b2_distance(b2Transform p_transformA, b2Shape *shapeA, b2Transform p_transformB, b2Shape *shapeB) {

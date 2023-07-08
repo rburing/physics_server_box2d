@@ -532,7 +532,6 @@ Object *Box2DCollisionObject::get_object() const {
 }
 Object *Box2DCollisionObject::get_object_unsafe() const {
 	return reinterpret_cast<Object *>((GodotObject *)(internal::gdextension_interface_object_get_instance_from_id(object_instance_id)));
-	;
 }
 
 void Box2DCollisionObject::set_canvas_instance_id(const ObjectID &p_instance_id) {
@@ -736,7 +735,6 @@ void Box2DCollisionObject::_update_shapes() {
 					s.disabled = true;
 					break;
 				}
-				s.shape->add_b2_shape(b2_shape);
 				fixture_def.density = 1.0f;
 				fixture_def.filter = filter;
 				fixture_def.friction = physics_material.friction;
