@@ -32,6 +32,10 @@ runs:
       run:
         ./scripts/clang-format.sh
         ./scripts/clang-tidy.sh
+    - name: Box2d Assert Hack - 
+      shell: sh
+      run:
+        sed -i.bak 's/#define b2Assert(A) assert(A)/#define b2Assert(A) ((void)(A))/g' ./box2d/include/box2d/b2_common.h
     - name: Build Godot Cpp
       shell: sh
       env:
@@ -49,8 +53,7 @@ runs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Physics Server Box2D - ${{ matrix.os }}
+        name: Physics Server Box2D
         path: |
-          ${{ github.workspace }}/demo/bin/
-          ${{ github.workspace }}/demo/physics_server_box2d.gdextension
+          ${{ github.workspace }}/demo/addons/**
         retention-days: 14

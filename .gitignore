@@ -6,7 +6,7 @@ demo/.godot/
 *.dblite
 
 # Generated directories with binaries
-demo/bin/
+demo/addons/physics_server_box2d/bin/
 
 .DS_Store
 .vscode

@@ -43,7 +43,7 @@ class PhysicsServerBox2D : public PhysicsServer2DExtension {
 	mutable RID_PtrOwner<Box2DArea, true> area_owner;
 	mutable RID_PtrOwner<Box2DBody, true> body_owner;
 	mutable RID_PtrOwner<Box2DJoint, true> joint_owner;
-	float step_amount = 0;
+	double step_amount = 0;
 
 	RID _shape_create(ShapeType p_shape);
 

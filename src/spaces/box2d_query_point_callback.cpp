@@ -33,10 +33,10 @@ bool Box2DQueryPointCallback::ReportFixture(b2Fixture *fixture) {
 			// test for point containment
 			(fixture->GetShape()->TestPoint(fixture->GetBody()->GetTransform(), position))) {
 		Box2DCollisionObject *collision_object = fixture->GetBody()->GetUserData().collision_object;
-		if (space_state->is_body_excluded_from_query(collision_object->get_self())) {
-			return -1;
-		}
-		if (check_canvas_instance_id && collision_object->get_canvas_instance_id() != godot::ObjectID(canvas_instance_id)) {
+		// exclude from query
+		if (space_state->is_body_excluded_from_query(collision_object->get_self()) ||
+				// different canvas id
+				(check_canvas_instance_id && collision_object->get_canvas_instance_id() != godot::ObjectID(canvas_instance_id))) {
 			return true;
 		}
 		hit_count++;

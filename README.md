@@ -10,6 +10,9 @@ The goal of the project is to be a drop-in solution for 2D physics in Godot 4.1.
 
 Missing functionality:
 
+- Pickable not implemented
+- Collision layer and mask don't work same as in godot
+- Torque and rotation doesn't work same as in godot (different values)
 - Skewed/scaled shapes.
 - Separation Ray works as a segment.
 - Pin joint doesn't have softness
@@ -19,7 +22,7 @@ Things that work:
 
 Bodies:
 - [x] Rigid Body
-- [x] Kinematic Body
+- [] Kinematic Body
 - [x] Static Body
 - [x] Area
 
@@ -42,6 +45,30 @@ Direct State:
 - [x] Direct Body State
 - [x] Direct Space State
 
+
+## Install from build binaries
+
+Currently it's built automatically for:
+
+- Windows (x86-64, x86)
+- Linux (x86-64)
+- macOS (x86-64 + Apple Silicon)
+- iOS (arm64)
+- Android (arm64 + x86_64)
+
+NOTE: the builds are not signed right now, so you might get a warning if you download for mac for eg.
+
+
+Go to any action workflow on this project: [Actions List](https://github.com/rburing/physics_server_box2d/actions)
+
+1. [Download worflow artifacts](https://docs.github.com/en/actions/managing-workflow-runs/downloading-workflow-artifacts) from github job
+2. Extract the ZIP archive and move the `addons/` folder it contains into your project folder
+3. Open your project settings
+4. Make sure "Advanced Settings" is enabled
+5. Go to "Physics" and then "2D"
+6. Change "Physics Engine" to "Box2D"
+7. Restart Godot
+
 ## Building from source
 
 1. Clone the git repository https://github.com/rburing/physics_server_box2d, including its `box2d` and `godot-cpp` submodules.
@@ -53,7 +80,21 @@ Direct State:
        cd godot-cpp
        scons target=template_debug generate_bindings=yes
 
-4. Compile the GDExtension for the same `target` as above:
+4. Hack to disable b2Assert. Run:
+
+On linux:
+
+```
+sed -i 's/#define b2Assert(A) assert(A)/#define b2Assert(A) ((void)(A))/g' ./box2d/include/box2d/b2_common.h
+```
+
+On macos:
+
+```
+sed -i '' 's/#define b2Assert(A) assert(A)/#define b2Assert(A) ((void)(A))/g' ./box2d/include/box2d/b2_common.h
+```
+
+5. Compile the GDExtension for the same `target` as above:
 
        cd ..
        scons target=template_debug generate_bindings=no

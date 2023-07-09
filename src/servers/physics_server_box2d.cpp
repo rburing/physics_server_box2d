@@ -1,4 +1,7 @@
 #include "physics_server_box2d.h"
+
+#include "../b2_user_settings.h"
+
 #include "../spaces/box2d_sweep_test.h"
 
 #include "../bodies/box2d_direct_body_state.h"
@@ -51,7 +54,7 @@ RID PhysicsServerBox2D::_shape_create(ShapeType p_shape) {
 			shape = memnew(Box2DShapeSeparationRay);
 		} break;
 		default: {
-			ERR_FAIL_V_MSG(RID(), "UNSUPPORTED");
+			ERR_FAIL_V_MSG(RID(), "UNSUPPORTED shape.");
 		} break;
 	}
 
@@ -100,6 +103,7 @@ void PhysicsServerBox2D::_shape_set_data(const RID &p_shape, const Variant &p_da
 }
 
 void PhysicsServerBox2D::_shape_set_custom_solver_bias(const RID &shape, double bias) {
+	WARN_PRINT_ONCE("_shape_set_custom_solver_bias is UNUSED");
 }
 
 PhysicsServer2D::ShapeType PhysicsServerBox2D::_shape_get_type(const RID &p_shape) const {
@@ -116,54 +120,45 @@ Variant PhysicsServerBox2D::_shape_get_data(const RID &p_shape) const {
 }
 
 double PhysicsServerBox2D::_shape_get_custom_solver_bias(const RID &shape) const {
+	WARN_PRINT_ONCE("_shape_get_custom_solver_bias is UNUSED");
 	return 0;
 }
 
 bool PhysicsServerBox2D::_shape_collide(const RID &p_shape_A, const Transform2D &p_xform_A, const Vector2 &p_motion_A, const RID &p_shape_B, const Transform2D &p_xform_B, const Vector2 &p_motion_B, void *p_results, int32_t p_result_max, int32_t *p_result_count) {
-	// TODO does this function use the motion vector?
-	ERR_PRINT("shape_collide");
-	return false;
-	if (p_result_max == 0) {
-		return false;
-	}
-	const Box2DShape *const_shape_A = shape_owner.get_or_null(p_shape_A);
-	const Box2DShape *const_shape_B = shape_owner.get_or_null(p_shape_B);
-	ERR_FAIL_COND_V(!const_shape_A, false);
-	ERR_FAIL_COND_V(!const_shape_B, false);
-	Box2DShape *shape_A = const_cast<Box2DShape *>(const_shape_A);
-	Box2DShape *shape_B = const_cast<Box2DShape *>(const_shape_B);
-	b2Body *bodyA = shape_A->get_body()->get_b2Body();
-	b2Body *bodyB = shape_B->get_body()->get_b2Body();
-	ERR_FAIL_COND_V(!bodyA, false);
-	ERR_FAIL_COND_V(!bodyB, false);
-	b2Transform xfA(godot_to_box2d(p_xform_A.get_origin()), b2Rot(p_xform_A.get_rotation()));
-	b2Transform xfB(godot_to_box2d(p_xform_B.get_origin()), b2Rot(p_xform_B.get_rotation()));
-	bool overlap = false;
-	int result_count = 0;
-	b2Sweep sweepA = Box2DSweepTest::create_b2_sweep(xfA, bodyA->GetLocalCenter(), godot_to_box2d(p_motion_A));
-	b2Sweep sweepB = Box2DSweepTest::create_b2_sweep(xfB, bodyB->GetLocalCenter(), godot_to_box2d(p_motion_B));
-	auto *results = static_cast<Vector2 *>(p_results);
-	int intersect_count = 0;
+	Box2DShape *shape_A = shape_owner.get_or_null(p_shape_A);
+	Box2DShape *shape_B = shape_owner.get_or_null(p_shape_B);
+	ERR_FAIL_COND_V(!shape_A, false);
+	ERR_FAIL_COND_V(!shape_B, false);
+	b2Transform shape_A_transform(godot_to_box2d(p_xform_A.get_origin()), b2Rot(p_xform_A.get_rotation()));
+	b2Transform shape_B_transform(godot_to_box2d(p_xform_B.get_origin()), b2Rot(p_xform_B.get_rotation()));
+	b2Sweep sweepA = Box2DSweepTest::create_b2_sweep(shape_A_transform, b2Vec2_zero, godot_to_box2d(p_motion_A));
+	b2Sweep sweepB = Box2DSweepTest::create_b2_sweep(shape_B_transform, b2Vec2_zero, godot_to_box2d(p_motion_B));
+	Vector<SweepTestResult> sweep_results;
 	for (int i = 0; i < shape_A->get_b2Shape_count(false); i++) {
-		if (intersect_count >= p_result_max) {
-			break;
-		}
-		b2Shape *b2_shapeA = shape_A->get_transformed_b2Shape(i, Transform2D(), false, false);
-		for (int j = 0; j < shape_B->get_b2Shape_count(false); j++) {
-			if (intersect_count >= p_result_max) {
-				break;
-			}
-			b2Shape *b2_shapeB = shape_B->get_transformed_b2Shape(i, Transform2D(), false, false);
-			Box2DSweepTest::Box2DSweepTestResult output = Box2DSweepTest::shape_cast(xfA, b2_shapeA, bodyA, sweepA, xfB, b2_shapeB, bodyB, sweepB, step_amount);
-			if (output.intersects) {
-				results[intersect_count++] = box2d_to_godot(output.output.pointA);
-			}
-			memfree(b2_shapeB);
-		}
-		memfree(b2_shapeA);
-	}
+		b2Shape *b2_shape_A = (shape_A->get_transformed_b2Shape(i, false, false));
 
-	return *p_result_count != 0;
+		for (int j = 0; j < shape_A->get_b2Shape_count(false); j++) {
+			b2Shape *b2_shape_B = (shape_A->get_transformed_b2Shape(i, false, false));
+			SweepShape sweep_shape_A{ shape_A, sweepA, nullptr, shape_A_transform };
+			SweepShape sweep_shape_B{ shape_B, sweepB, nullptr, shape_B_transform };
+			SweepTestResult output = Box2DSweepTest::shape_cast(sweep_shape_A, b2_shape_A, sweep_shape_B, b2_shape_B);
+			if (output.collision) {
+				sweep_results.append(output);
+			}
+		}
+	}
+	auto *results = static_cast<Vector2 *>(p_results);
+	int count = 0;
+	for (SweepTestResult sweep_result : sweep_results) {
+		for (int i = 0; i < sweep_result.manifold_point_count; i++) {
+			if (count >= p_result_max) {
+				return !sweep_results.is_empty();
+			}
+			results[count++] = box2d_to_godot(sweep_result.manifold.points[i]);
+		}
+	}
+	*p_result_count = count;
+	return !sweep_results.is_empty();
 }
 
 /* SPACE API */
@@ -196,7 +191,7 @@ bool PhysicsServerBox2D::_space_is_active(const RID &p_space) const {
 void PhysicsServerBox2D::_space_set_param(const RID &p_space, PhysicsServer2D::SpaceParameter p_param, double p_value) {
 	const Box2DSpace *space_const = space_owner.get_or_null(p_space);
 	ERR_FAIL_COND(!space_const);
-
+	// TODO add rest of params
 	switch (p_param) {
 		case SPACE_PARAM_SOLVER_ITERATIONS: {
 			Box2DSpace *space = const_cast<Box2DSpace *>(space_const);
@@ -210,7 +205,7 @@ void PhysicsServerBox2D::_space_set_param(const RID &p_space, PhysicsServer2D::S
 double PhysicsServerBox2D::_space_get_param(const RID &p_space, PhysicsServer2D::SpaceParameter p_param) const {
 	const Box2DSpace *space = space_owner.get_or_null(p_space);
 	ERR_FAIL_COND_V(!space, 0);
-
+	// TODO add rest of params
 	switch (p_param) {
 		case SPACE_PARAM_SOLVER_ITERATIONS:
 			return (double)space->get_solver_iterations();
@@ -545,7 +540,7 @@ void PhysicsServerBox2D::_body_set_space(const RID &p_body, const RID &p_space) 
 	}
 
 	if (body->get_space() == space) {
-		return; //pointless
+		return;
 	}
 
 	//body->clear_constraint_list();
@@ -586,7 +581,6 @@ void PhysicsServerBox2D::_body_add_shape(const RID &p_body, const RID &p_shape, 
 	ERR_FAIL_COND(!shape);
 
 	body->add_shape(shape, p_transform, p_disabled);
-	shape->set_body(body);
 }
 
 void PhysicsServerBox2D::_body_set_shape(const RID &p_body, int32_t p_shape_idx, const RID &p_shape) {
@@ -598,7 +592,6 @@ void PhysicsServerBox2D::_body_set_shape(const RID &p_body, int32_t p_shape_idx,
 	ERR_FAIL_COND(!shape->is_configured());
 
 	body->set_shape(p_shape_idx, shape);
-	shape->set_body(body);
 }
 
 void PhysicsServerBox2D::_body_set_shape_transform(const RID &p_body, int32_t p_shape_idx, const Transform2D &p_transform) {
@@ -969,8 +962,6 @@ bool PhysicsServerBox2D::_body_is_omitting_force_integration(const RID &p_body) 
 void PhysicsServerBox2D::_body_set_force_integration_callback(const RID &p_body, const Callable &p_callable, const Variant &p_userdata) {
 }
 bool PhysicsServerBox2D::_body_collide_shape(const RID &p_body, int32_t p_body_shape, const RID &p_shape, const Transform2D &p_shape_xform, const Vector2 &p_motion, void *p_results, int32_t p_result_max, int32_t *p_result_count) {
-	ERR_PRINT("body_collide");
-	return false;
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND_V(!body, false);
 	Box2DShape *shape = shape_owner.get_or_null(p_shape);
@@ -980,8 +971,7 @@ bool PhysicsServerBox2D::_body_collide_shape(const RID &p_body, int32_t p_body_s
 	}
 	Box2DDirectSpaceState *space_state = (Box2DDirectSpaceState *)body->get_space_state();
 	ERR_FAIL_COND_V(!space_state, false);
-	space_state->_collide_shape(shape->get_self(), p_shape_xform, p_motion, 0, body->get_collision_mask(), true, true, p_results, p_result_max, p_result_count);
-	return false;
+	return space_state->_collide_shape(shape->get_self(), p_shape_xform, p_motion, 0, body->get_collision_mask(), true, true, p_results, p_result_max, p_result_count);
 }
 void PhysicsServerBox2D::_body_set_pickable(const RID &p_body, bool p_pickable) {
 	Box2DBody *body = body_owner.get_or_null(p_body);
@@ -989,37 +979,45 @@ void PhysicsServerBox2D::_body_set_pickable(const RID &p_body, bool p_pickable) 
 	return body->set_pickable(p_pickable);
 }
 bool PhysicsServerBox2D::_body_test_motion(const RID &p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *p_result) const {
-	ERR_PRINT("body_test");
 	Box2DBody *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_COND_V(!body, false);
 	Box2DDirectSpaceState *space_state = (Box2DDirectSpaceState *)body->get_space_state();
 	ERR_FAIL_COND_V(!space_state, false);
-	int count = 0;
-	Box2DSweepTest::Box2DSweepTestResult result;
-	result.intersects = false;
+	Vector<Box2DShape *> shapes;
 	for (int i = 0; i < body->get_shape_count(); i++) {
 		Box2DShape *shape = body->get_shape(i);
-		Box2DSweepTest::Box2DSweepTestResult motion_result = space_state->_test_motion(shape->get_self(), p_from, p_motion, p_margin, body->get_collision_mask(), true, true);
-		if (motion_result.intersects && motion_result.output.distance < 10.0f * b2_epsilon) {
-			if (!result.intersects || result.distance > motion_result.distance) {
-				result = motion_result;
-				PhysicsServer2DExtensionMotionResult &current_result = *p_result;
-				current_result.collider = shape->get_self(); // TODO, wrong, need to send other shape
-				current_result.collider_id = shape->get_body()->get_object_instance_id(); // TODO, wrong, need to send other shape
-				current_result.travel = Vector2(); // TODO
-				current_result.remainder = Vector2(); // TODO
-				current_result.collision_point = box2d_to_godot(result.place_of_impact.p);
-				current_result.collision_normal = box2d_to_godot(result.output.pointA - result.output.pointA).normalized();
-				current_result.collider_velocity = box2d_to_godot(result.body_B->GetLinearVelocity());
-				current_result.collision_safe_fraction = box2d_to_godot(result.place_of_impact.p + result.output.pointA - godot_to_box2d(p_from.get_origin())).length();
-				current_result.collision_unsafe_fraction = current_result.collision_safe_fraction + p_margin;
-				current_result.collision_unsafe_fraction = 0; // TODO
-				current_result.collision_local_shape = 0; // TODO
-				current_result.collider_shape = 0; // TODO
-			}
+		shapes.append(shape);
+	}
+
+	Vector<b2Fixture *> query_result = Box2DSweepTest::query_aabb_motion(shapes, p_from, p_motion, p_margin, 0xff, true, true, (Box2DDirectSpaceState *)body->get_space_state());
+	Vector<SweepTestResult> sweep_test_results = Box2DSweepTest::multiple_shapes_cast(shapes, p_from, p_motion, p_margin, 0xff, true, true, 2048, query_result, (Box2DDirectSpaceState *)body->get_space_state());
+	SweepTestResult sweep_test_result = Box2DSweepTest::closest_result_in_cast(sweep_test_results);
+	PhysicsServer2DExtensionMotionResult &current_result = *p_result;
+	if (!sweep_test_result.collision) {
+		current_result.travel = p_motion;
+		current_result.remainder = Vector2();
+		current_result.collision_safe_fraction = 1;
+		current_result.collision_unsafe_fraction = 1;
+		return false;
+	}
+	current_result.collider = sweep_test_result.sweep_shape_B.fixture->GetUserData().shape->get_self();
+	current_result.collider_id = sweep_test_result.sweep_shape_B.shape->get_body()->get_b2Body()->GetUserData().collision_object->get_object_instance_id();
+	current_result.collision_point = box2d_to_godot(sweep_test_result.manifold.points[0]);
+	current_result.collision_normal = Vector2(sweep_test_result.manifold.normal.x, sweep_test_result.manifold.normal.y);
+	current_result.collider_velocity = box2d_to_godot(sweep_test_result.sweep_shape_B.shape->get_body()->get_b2Body()->GetLinearVelocity());
+	current_result.collision_safe_fraction = sweep_test_result.safe_fraction();
+	current_result.collision_unsafe_fraction = sweep_test_result.unsafe_fraction();
+	current_result.travel = p_motion * current_result.collision_safe_fraction;
+	current_result.remainder = p_motion - current_result.travel;
+	int shape_A_index = 0;
+	for (int i = 0; i < body->get_shape_count(); i++) {
+		if (body->get_shape(i) == sweep_test_result.sweep_shape_A.shape) {
+			shape_A_index = i;
 		}
 	}
-	return result.intersects;
+	current_result.collision_local_shape = shape_A_index;
+	current_result.collider_shape = sweep_test_result.sweep_shape_B.fixture->GetUserData().shape_idx;
+	return true;
 }
 
 /* JOINT API */
@@ -1227,7 +1225,7 @@ void PhysicsServerBox2D::_step(double p_step) {
 
 	for (const Box2DSpace *E : active_spaces) {
 		Box2DSpace *space = const_cast<Box2DSpace *>(E);
-		space->step((float)p_step);
+		space->step((double)p_step);
 	}
 }
 void PhysicsServerBox2D::_sync() {

@@ -20,6 +20,7 @@ class Box2DShape {
 protected:
 	bool configured = false;
 	PhysicsServer2D::ShapeType type;
+	Transform2D transform;
 
 public:
 	_FORCE_INLINE_ PhysicsServer2D::ShapeType get_type() const { return type; }
@@ -35,7 +36,9 @@ public:
 	virtual Variant get_data() const = 0;
 
 	virtual int get_b2Shape_count(bool is_static) const = 0;
-	virtual b2Shape *get_transformed_b2Shape(int p_index, const Transform2D &p_transform, bool one_way, bool is_static) = 0;
+	_FORCE_INLINE_ Transform2D get_transform() { return transform; }
+	_FORCE_INLINE_ void set_transform(Transform2D &p_transform) { transform = p_transform; }
+	virtual b2Shape *get_transformed_b2Shape(int p_index, bool one_way, bool is_static) = 0;
 
 	Box2DShape() { type = PhysicsServer2D::SHAPE_CUSTOM; }
 	virtual ~Box2DShape(){};

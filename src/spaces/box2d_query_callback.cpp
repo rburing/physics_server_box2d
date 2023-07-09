@@ -2,6 +2,8 @@
 
 #include "../b2_user_settings.h"
 
+#define QUERY_MAX_SIZE 2048
+
 Box2DQueryCallback::Box2DQueryCallback(Box2DDirectSpaceState *p_space_state,
 		uint32_t p_collision_mask,
 		bool p_collide_with_bodies,
@@ -24,9 +26,9 @@ bool Box2DQueryCallback::ReportFixture(b2Fixture *fixture) {
 					(!fixture->IsSensor() && collide_with_bodies))) {
 		Box2DCollisionObject *collision_object = fixture->GetBody()->GetUserData().collision_object;
 		if (space_state->is_body_excluded_from_query(collision_object->get_self())) {
-			return -1;
+			return true;
 		}
 		results.append(fixture);
 	}
-	return true;
+	return results.size() < QUERY_MAX_SIZE;
 }
